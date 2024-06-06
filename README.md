@@ -3,7 +3,7 @@
 ## Original Repo: [AnyText: Multilingual Visual Text Generation And Editing](https://github.com/tyxsspa/AnyText)
 
 ## Warning: This custom-node will not work well.
-## The branch "Native Implementation" is more native, not like main branch(remote_code mode), but i can not make it work. If it works, many bug caused by incompitable can be avoided.
+## The branch "Native Implementation" is more native, not like main branch(remote_code mode), but i can not make it work. If it works, bugs caused by incompatible can be avoided.
 ## Instructions:
 
 - works on my pc: ComfyUI official release+(ComfyUI_windows_portable\ComfyUI)start with powershell+win10+torch2.2.1(2.3.0)+cu121+rtx3050laptop(4GB).
