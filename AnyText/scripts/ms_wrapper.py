@@ -10,7 +10,7 @@ import time
 from PIL import ImageFont
 from cldm.model import create_model, load_state_dict
 from cldm.ddim_hacked import DDIMSampler
-from t3_dataset import draw_glyph, draw_glyph2
+from .t3_dataset import draw_glyph, draw_glyph2
 from .util import check_channels, resize_image, save_images
 from pytorch_lightning import seed_everything
 from modelscope.pipelines import pipeline
@@ -23,7 +23,7 @@ from modelscope.pipelines.builder import PIPELINES
 from modelscope.preprocessors.builder import PREPROCESSORS
 from modelscope.models.builder import MODELS
 from modelscope.hub.snapshot_download import snapshot_download
-from bert_tokenizer import BasicTokenizer
+from .bert_tokenizer import BasicTokenizer
 import folder_paths
 from huggingface_hub import hf_hub_download
 
