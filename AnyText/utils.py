@@ -167,7 +167,6 @@ class AnyText_Pose_IMG:
         inverted_mask_image = invert_mask.reshape((-1, 1, mask.shape[-2], mask.shape[-1])).movedim(1, -1).expand(-1, -1, -1, 3)
         i = 255. * inverted_mask_image.cpu().numpy()[0]
         img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
-        print("\033[93mInput img Resolution<=768x768 Recommended(输入图像分辨率,建议<=768x768):", comfyui_temp_dir, "\033[0m\n")
         print("\033[93mInput img Resolution<=768x768 Recommended(输入图像分辨率,建议<=768x768):", width, "x", height, "\033[0m\n")
         img.save(os.path.join(comfyui_temp_dir,  "AnyText_mask_pos_img.png"))
 

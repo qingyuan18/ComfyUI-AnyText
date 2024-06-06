@@ -3,9 +3,11 @@
 ## Original Repo: [AnyText: Multilingual Visual Text Generation And Editing](https://github.com/tyxsspa/AnyText)
 
 ## Warning: This custom-node will not work well.
+## The branch "Native Implementation" is more native, not like main branch(remote_code mode), but i can not make it work. If it works, many bug caused by incompitable can be avoided.
 ## Instructions:
 
-- works on my pc: win10+torch2.2.1+cu121+rtx3050laptop(4GB).
+- works on my pc: ComfyUI official release+(ComfyUI_windows_portable\ComfyUI)start with powershell+win10+torch2.2.1(2.3.0)+cu121+rtx3050laptop(4GB).
+- pillow>=9.5.0(10.3.0) Most packages are the newest.
 - **Input image resolution must be multiple of 64.** Input image max resolution 768x768 Recommended.
 - **If font、ckpt_name、clip、translator set to Auto_DownLoad, default models will automtically download to specified directory. Models will loaded if models already exist.**
 - AnyText model will automatically download into "ComfyUI\models\checkpoints\15\anytext_v1.1.safetensors" from huggingface(fp16: 2.66 GB) when first time executing the node if the model file dose not exist.

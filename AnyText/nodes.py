@@ -32,7 +32,6 @@ class AnyText:
                 "revise_pos": ("BOOLEAN", {"default": False}),
                 "img_count": ("INT", {"default": 1, "min": 1, "max": 10}),
                 "ddim_steps": ("INT", {"default": 20, "min": 1, "max": 100}),
-                "show_debug": ("BOOLEAN", {"default": False}),
                 "use_translator": ("BOOLEAN", {"default": False}),
                 "seed": ("INT", {"default": 9999, "min": -1, "max": 99999999}),
                 "width": ("INT", {"default": 512, "min": 128, "max": 1920, "step": 64}),
@@ -63,6 +62,8 @@ class AnyText:
             "optional": {
                         "ori_image": ("ref", {"forceInput": True}),
                         "pos_image": ("pos", {"forceInput": True}),
+                        #"allow_remote": ("BOOLEAN", {"default": False}),
+                        "show_debug": ("BOOLEAN", {"default": False}),
                         },
         }
 
@@ -81,6 +82,7 @@ class AnyText:
         Random_Gen,
         prompt, 
         show_debug, 
+        #allow_remote,
         use_translator,
         img_count, 
         fp16,
@@ -165,7 +167,8 @@ class AnyText:
         else:
             raise Exception(f"width and height must be multiple of 64(宽度和高度必须为64的倍数).")
         
-        path = f"{current_directory}\scripts"
+        # path = f"{current_directory}\scripts"
+        remote_code_path = os.path.join(current_directory, "scripts")
         
         loader_out = AnyText_Loader.split("|")
         
@@ -175,7 +178,18 @@ class AnyText:
                 pass
             else:
                 snapshot_download('damo/nlp_csanmt_translation_zh2en', revision='v1.0.1')
-        pipe = pipeline('my-anytext-task', model=path, font_path=loader_out[0], ckpt_path=loader_out[1], clip_path=loader_out[2], use_fp16=fp16, translator_path=loader_out[3], cfg_path=loader_out[4], use_translator=use_translator)
+        pipe = pipeline(
+                        'my-anytext-task', 
+                        model=remote_code_path, 
+                        font_path=loader_out[0], 
+                        ckpt_path=loader_out[1], 
+                        clip_path=loader_out[2], 
+                        translator_path=loader_out[3], 
+                        cfg_path=loader_out[4], 
+                        use_fp16=fp16, 
+                        use_translator=use_translator, 
+                        #allow_remote=allow_remote
+                    )
         n_lines = count_lines(prompt)
         if Random_Gen == True:
             pos_img = generate_rectangles(width, height, n_lines, max_trys=500)
@@ -222,7 +236,8 @@ class AnyText:
             print("\033[93mTranslator(翻译模型)--loader_out[3]:", loader_out[3], "\033[0m\n")
             print("\033[93myaml_file(yaml配置文件):", loader_out[4], "\033[0m\n")
             print("\033[93mChinese2English translator(中译英):", use_translator, "\033[0m\n")
-            print("\033[93mBackend scripts location(后端脚本位置):", path, "\033[0m\n")
+            # print("\033[93mallow_remote(远程代码):", allow_remote, "\033[0m\n")
+            print("\033[93mBackend scripts location(后端脚本位置):", remote_code_path, "\033[0m\n")
             print("\033[93mNumber of text-content to generate(需要生成的文本数量):", n_lines, "\033[0m\n")
             print("\033[93mpos_image location(遮罩图位置):", pos_image, "\033[0m\n")
             print("\033[93mori_image location(原图位置):", ori_image, "\033[0m\n")
