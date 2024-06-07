@@ -2,10 +2,10 @@
 
 ## 原Repo: [AnyText: Multilingual Visual Text Generation And Editing](https://github.com/tyxsspa/AnyText)
 
-## 警告: 这个插件可能达不到预期。
-## 分支 "Native Implementation"是一个更加本地化的实现，跟main不一样（main采用remote_code模式）。但是一个导包问题没能解决，所以无法跑通。如果能跑通，一些兼容性bug应该能避免。
+## 警告: 
+- 这个插件生成结果可能比官方差很多。
+## 吐血！！！重写了好多代码，结果全被github还原了。v2版本遥遥无期了。
 ## 使用说明:
-
 - 个人电脑环境: ComfyUI官方整合包+(ComfyUI_windows_portable\ComfyUI下)脚本运行+win10+torch2.2.1+cu121+rtx3050laptop(4GB).
 - pillow>=9.5.0(10.3.0)大部分包都是最新版本。
 - **输入的图片分辨率必须为64的倍数。** 输入图片最大分辨率建议768x768。

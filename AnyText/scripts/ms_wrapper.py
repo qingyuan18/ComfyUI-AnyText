@@ -23,7 +23,7 @@ from modelscope.pipelines.builder import PIPELINES
 from modelscope.preprocessors.builder import PREPROCESSORS
 from modelscope.models.builder import MODELS
 from modelscope.hub.snapshot_download import snapshot_download
-from .bert_tokenizer import BasicTokenizer
+from .AnyText_bert_tokenizer import BasicTokenizer
 import folder_paths
 from huggingface_hub import hf_hub_download
 
