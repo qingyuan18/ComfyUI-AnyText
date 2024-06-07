@@ -4,7 +4,10 @@
 
 ## 警告: 
 - 这个插件生成结果可能比官方差很多。
+- 仅在ComfyUI官方整合包加绿色版(python_embed)测试，第三方整合包和虚拟环境可能无法使用。
+
 ## 吐血！！！重写了好多代码，结果全被github还原了。v2版本遥遥无期了。
+
 ## 使用说明:
 - 个人电脑环境: ComfyUI官方整合包+(ComfyUI_windows_portable\ComfyUI下)脚本运行+win10+torch2.2.1+cu121+rtx3050laptop(4GB).
 - pillow>=9.5.0(10.3.0)大部分包都是最新版本。

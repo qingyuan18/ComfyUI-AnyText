@@ -4,9 +4,11 @@
 
 ## Warning: 
 - This custom-node results may worse than official.
-## Fucked up!!! Rewrite lots of code, but all restored by github. v2 is far away.
-## Instructions:
+- Works well with official ComfyUI release using python_embed in my case. Distributions from unofficial or vitural env may not work.
 
+## Fucked up!!! Rewrite lots of code, but all restored by github. v2 is far away.
+
+## Instructions:
 - works on my pc: ComfyUI official release+(ComfyUI_windows_portable\ComfyUI)start with powershell+win10+torch2.2.1(2.3.0)+cu121+rtx3050laptop(4GB).
 - pillow>=9.5.0(10.3.0) Most packages are the newest.
 - **Input image resolution must be multiple of 64.** Input image max resolution 768x768 Recommended.
