@@ -1,15 +1,15 @@
-from modelscope.pipelines import pipeline
 import os
 import folder_paths
 import re
 import torch
-from modelscope.pipelines import pipeline
 import cv2
 import numpy as np
 import cv2
 from modelscope.hub.snapshot_download import snapshot_download
+from .AnyText_scripts.AnyText_pipeline import AnyText_Pipeline
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
+comfyui_temp_dir = folder_paths.get_temp_directory()
 
 def pil2tensor(image):
     return torch.from_numpy(np.array(image).astype(np.float32) / 255.0).unsqueeze(0)
@@ -40,6 +40,7 @@ class AnyText:
                 # "height": ("INT", {"forceInput": True}),
                 "Random_Gen": ("BOOLEAN", {"default": False}),
                 "fp16": ("BOOLEAN", {"default": True}),
+                "device": (["cuda", "cpu"],{"default": "cuda"}), 
                 "strength": ("FLOAT", {
                     "default": 1.00,
                     "min": -999999,
@@ -62,7 +63,6 @@ class AnyText:
             "optional": {
                         "ori_image": ("ref", {"forceInput": True}),
                         "pos_image": ("pos", {"forceInput": True}),
-                        #"allow_remote": ("BOOLEAN", {"default": False}),
                         "show_debug": ("BOOLEAN", {"default": False}),
                         },
         }
@@ -80,9 +80,9 @@ class AnyText:
         sort_radio,
         revise_pos,
         Random_Gen,
+        device,
         prompt, 
         show_debug, 
-        #allow_remote,
         use_translator,
         img_count, 
         fp16,
@@ -153,7 +153,12 @@ class AnyText:
                     attempts += 1
                     continue
                 n_pass += 1
-                cv2.fillPoly(img, [rect_pts], 255)
+                # cv2.fillPoly(img, [rect_pts], 255)
+                img = cv2.fillPoly(img, [rect_pts], 255)
+                # img = Image.fromarray((img[0] * 255).astype(np.uint8))
+                # img = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8))
+                cv2.imwrite(os.path.join(comfyui_temp_dir,  "AnyText_mask_pos_img.png"), 255-img[..., ::-1])
+                # img.save(os.path.join(comfyui_temp_dir,  "AnyText_mask_pos_img.png"))
                 rectangles.append(rect_pts)
                 if n_pass == n:
                     break
@@ -167,33 +172,21 @@ class AnyText:
         else:
             raise Exception(f"width and height must be multiple of 64(宽度和高度必须为64的倍数).")
         
-        # path = f"{current_directory}\scripts"
-        remote_code_path = os.path.join(current_directory, "scripts")
-        
         loader_out = AnyText_Loader.split("|")
-        if fp16 == False:
-            raise Exception(f"FP32 not work at now(暂时不支持FP32).")
+        
         if use_translator == True:
             #如果启用中译英，则提前判断本地是否存在翻译模型，没有则自动下载，以防跑半路报错。
             if os.access(os.path.join(folder_paths.models_dir, "prompt_generator", "nlp_csanmt_translation_zh2en", "tf_ckpts", "ckpt-0.data-00000-of-00001"), os.F_OK):
                 pass
             else:
                 snapshot_download('damo/nlp_csanmt_translation_zh2en', revision='v1.0.1')
-        pipe = pipeline(
-                        'my-anytext-task', 
-                        model=remote_code_path, 
-                        font_path=loader_out[0], 
-                        ckpt_path=loader_out[1], 
-                        clip_path=loader_out[2], 
-                        translator_path=loader_out[3], 
-                        cfg_path=loader_out[4], 
-                        use_fp16=fp16, 
-                        use_translator=use_translator, 
-                        #allow_remote=allow_remote
-                    )
+        if device == 'cpu' or fp16 == False:
+            raise Exception(f"Only works with cuda and fp16 at now(暂时只支持cuda和fp16).")
+        pipe = AnyText_Pipeline(ckpt_path=loader_out[1], clip_path=loader_out[2], translator_path=loader_out[3], cfg_path=loader_out[4], use_translator=use_translator, device=device, use_fp16=fp16)
         n_lines = count_lines(prompt)
         if Random_Gen == True:
-            pos_img = generate_rectangles(width, height, n_lines, max_trys=500)
+            generate_rectangles(width, height, n_lines, max_trys=500)
+            pos_img = pos_image
         else:
             pos_img = pos_image
         if mode == "text-generation":
@@ -205,6 +198,7 @@ class AnyText:
         # lora_ratio = 1
         # lora_path_ratio = str(lora_path)+ " " + str(lora_ratio)
         # print("\033[93m", lora_path_ratio, "\033[0m")
+        print(pos_img)
         params = {
             "mode": mode,
             "sort_priority": sort_radio,
@@ -237,14 +231,12 @@ class AnyText:
             print("\033[93mTranslator(翻译模型)--loader_out[3]:", loader_out[3], "\033[0m\n")
             print("\033[93myaml_file(yaml配置文件):", loader_out[4], "\033[0m\n")
             print("\033[93mChinese2English translator(中译英):", use_translator, "\033[0m\n")
-            # print("\033[93mallow_remote(远程代码):", allow_remote, "\033[0m\n")
-            print("\033[93mBackend scripts location(后端脚本位置):", remote_code_path, "\033[0m\n")
             print("\033[93mNumber of text-content to generate(需要生成的文本数量):", n_lines, "\033[0m\n")
             print("\033[93mpos_image location(遮罩图位置):", pos_image, "\033[0m\n")
             print("\033[93mori_image location(原图位置):", ori_image, "\033[0m\n")
             print("\033[93mSort Position(文本生成位置排序):", sort_radio, "\033[0m\n")
             print("\033[93mEnable revise_pos(启用位置修正):", revise_pos, "\033[0m\n")
-        x_samples, results, rtn_code, rtn_warning, debug_info = pipe(input_data, **params)
+        x_samples, results, rtn_code, rtn_warning, debug_info = pipe(input_data, font_path=loader_out[0], **params)
         if rtn_code < 0:
             raise Exception(f"Error in AnyText pipeline: {rtn_warning}")
         output = pil2tensor(x_samples)

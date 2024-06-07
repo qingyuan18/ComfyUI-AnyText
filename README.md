@@ -3,13 +3,14 @@
 ## Original Repo: [AnyText: Multilingual Visual Text Generation And Editing](https://github.com/tyxsspa/AnyText)
 
 ## Warning: 
-- This custom-node results may worse than official.
-- Works well with official ComfyUI release using python_embed in my case. Distributions from unofficial or vitural env may not work.
-
-## Fucked up!!! Rewrite lots of code, but all restored by github. v2 is far away.
+- This custom-node results may worse than official. 
+- Works well with official ComfyUI release using python_embed on windows in my case. Distributions from unofficial or vitural env may not work.
+- Work with official start.bat and AIgodlike launcher(TGD), incompatible with Aki launcher.
+### v2 test, more native, not remote_code mode.
 
 ## Instructions:
-- works on my pc: ComfyUI official release+(ComfyUI_windows_portable\ComfyUI)start with powershell+win10+torch2.2.1(2.3.0)+cu121+rtx3050laptop(4GB).
+
+- works on my pc: ComfyUI official release+(ComfyUI_windows_portable\ComfyUI)start with powershell+python_embed+win10+py311+torch2.3.0+cu121+rtx3050laptop(4GB).
 - pillow>=9.5.0(10.3.0) Most packages are the newest.
 - **Input image resolution must be multiple of 64.** Input image max resolution 768x768 Recommended.
 - **If font、ckpt_name、clip、translator set to Auto_DownLoad, default models will automtically download to specified directory. Models will loaded if models already exist.**
