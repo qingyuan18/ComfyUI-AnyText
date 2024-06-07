@@ -9,6 +9,7 @@
 ### v2测试，更加本地化，非远程代码模式。
 
 ## 使用说明:
+- 手绘遮罩数量必须>=你想生成文字的数量，每一个“”代表一个文字数量，“”里面内容不限长度,否则会报错 ["not enough values to unpack"](https://github.com/zmwv823/ComfyUI-AnyText/issues/7).
 - 个人电脑环境: ComfyUI官方整合包+(ComfyUI_windows_portable\ComfyUI下)脚本运行+python_embed+win10+py311+torch2.3.0+cu121+rtx3050laptop(4GB).
 - pillow>=9.5.0(10.3.0)大部分包都是最新版本。
 - **输入的图片分辨率必须为64的倍数。** 输入图片最大分辨率建议768x768。

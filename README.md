@@ -9,7 +9,7 @@
 ### v2 test, more native, not remote_code mode.
 
 ## Instructions:
-
+- Numbers of draw_masks must >= nunbers of string_content (in the "") we want to generate, or it will raise an error ["not enough values to unpack"](https://github.com/zmwv823/ComfyUI-AnyText/issues/7).
 - works on my pc: ComfyUI official release+(ComfyUI_windows_portable\ComfyUI)start with powershell+python_embed+win10+py311+torch2.3.0+cu121+rtx3050laptop(4GB).
 - pillow>=9.5.0(10.3.0) Most packages are the newest.
 - **Input image resolution must be multiple of 64.** Input image max resolution 768x768 Recommended.
