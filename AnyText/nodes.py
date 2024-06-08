@@ -153,12 +153,8 @@ class AnyText:
                     attempts += 1
                     continue
                 n_pass += 1
-                # cv2.fillPoly(img, [rect_pts], 255)
                 img = cv2.fillPoly(img, [rect_pts], 255)
-                # img = Image.fromarray((img[0] * 255).astype(np.uint8))
-                # img = Image.fromarray(np.clip(img, 0, 255).astype(np.uint8))
-                cv2.imwrite(os.path.join(comfyui_temp_dir,  "AnyText_mask_pos_img.png"), 255-img[..., ::-1])
-                # img.save(os.path.join(comfyui_temp_dir,  "AnyText_mask_pos_img.png"))
+                cv2.imwrite(os.path.join(current_directory, "temp_dir",  "AnyText_mask_pos_img.png"), 255-img[..., ::-1])
                 rectangles.append(rect_pts)
                 if n_pass == n:
                     break

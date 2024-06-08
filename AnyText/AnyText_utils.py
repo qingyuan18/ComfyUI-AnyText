@@ -10,7 +10,8 @@ import numpy as np
 current_directory = os.path.dirname(os.path.abspath(__file__))
 comfyui_models_dir = folder_paths.models_dir
 comfyui_temp_dir = folder_paths.get_temp_directory()
-temp_txt_path =os.path.join(comfyui_temp_dir, "AnyText_temp.txt")
+temp_txt_path = os.path.join(current_directory, "temp_dir", "AnyText_temp.txt")
+temp_img_path = os.path.join(current_directory, "temp_dir", "AnyText_mask_pos_img.png")
 
 class AnyText_loader:
     @classmethod
@@ -116,9 +117,7 @@ class AnyText_Pose_IMG:
     
     def AnyText_Pose_IMG(self, image, seed):
         image_path = folder_paths.get_annotated_filepath(image)
-        # comfy_mask_pos_img_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "comfy_mask_pos_img.png")
-        comfy_mask_pos_img_path = os.path.join(comfyui_temp_dir,  "AnyText_mask_pos_img.png")
-        # gr_mask_pose_image_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "gr_mask_pos_imgs.png")
+        comfy_mask_pos_img_path = os.path.join(temp_img_path)
         img = node_helpers.pillow(Image.open, image_path)
         # width = img.width
         # height = img.height
@@ -168,8 +167,7 @@ class AnyText_Pose_IMG:
         i = 255. * inverted_mask_image.cpu().numpy()[0]
         img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
         print("\033[93mInput img Resolution<=768x768 Recommended(输入图像分辨率,建议<=768x768):", width, "x", height, "\033[0m\n")
-        img.save(os.path.join(comfyui_temp_dir,  "AnyText_mask_pos_img.png"))
-        # ori_image = output_image
+        img.save(temp_img_path)
 
         return (
             image_path, 
