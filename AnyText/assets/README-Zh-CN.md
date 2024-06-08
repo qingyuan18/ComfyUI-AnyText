@@ -6,6 +6,7 @@
 - 这个插件生成质量可能比官方差很多。
 - 仅在ComfyUI官方整合包+绿色便携(python_embed)+windows测试，第三方整合包、虚拟环境和其他操作系统(例如linux)可能无法使用。
 - 官方bat启动脚本和辣椒酱的铁锅炖启动器正常运行，秋叶管理器暂不兼容。
+- 启动ComfyUI时加载此插件需**耗时4秒+**。
 ### v2测试，更加本地化，非远程代码模式。
 
 ## 使用说明:
@@ -74,8 +75,9 @@
 - 使用ComfyUI原生生成的遮罩。
 
 ## 鸣谢:
-
-**[Repo: tyxsspa/AnyText](https://github.com/tyxsspa/AnyText)**
+### [Fork Repo: MaletteAI/anytext](https://github.com/MaletteAI/anytext)
+- V2构建本地管线思路的来源。
+### [Official Repo: tyxsspa/AnyText](https://github.com/tyxsspa/AnyText)
 
 ```
 @article{tuo2023anytext,

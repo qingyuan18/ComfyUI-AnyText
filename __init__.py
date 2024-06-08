@@ -11,7 +11,7 @@ else:
 	NODE_CLASS_MAPPINGS.update(AnyText_Nodes)
  
 	# AnyText_utils
-	from .AnyText.AnyText_utils import NODE_CLASS_MAPPINGS as AnyText_loader_Nodes
+	from .AnyText.utils import NODE_CLASS_MAPPINGS as AnyText_loader_Nodes
 	NODE_CLASS_MAPPINGS.update(AnyText_loader_Nodes)
  
 	NODE_DISPLAY_NAME_MAPPINGS = {k:v.TITLE for k,v in NODE_CLASS_MAPPINGS.items()}

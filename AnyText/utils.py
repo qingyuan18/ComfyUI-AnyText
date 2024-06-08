@@ -9,7 +9,6 @@ import numpy as np
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 comfyui_models_dir = folder_paths.models_dir
-comfyui_temp_dir = folder_paths.get_temp_directory()
 temp_txt_path = os.path.join(current_directory, "temp_dir", "AnyText_temp.txt")
 temp_img_path = os.path.join(current_directory, "temp_dir", "AnyText_mask_pos_img.png")
 
@@ -68,16 +67,16 @@ class AnyText_loader:
         # loader_s = loader.split("|")
         
         if show_debug == True:
-            print("\033[93mloader(合并后的4个输入参数，传递给.nodes):", loader, "\033[0m\n")
-            # print("\033[93mfont_path--loader[0]:", loader_s[0], "\033[0m\n")
-            # print("\033[93mckpt_path--loader[1]:", loader_s[1], "\033[0m\n")
-            # print("\033[93mclip_path--loader[2]:", loader_s[2], "\033[0m\n")
-            # print("\033[93mtranslator_path--loader[3]:", loader_s[3], "\033[0m\n")
-            print("\033[93mfont_path(字体):", font_path, "\033[0m\n")
-            print("\033[93mckpt_path(AnyText模型):", ckpt_path, "\033[0m\n")
-            print("\033[93mclip_path(clip模型):", clip_path, "\033[0m\n")
-            print("\033[93mtranslator_path(翻译模型):", translator_path, "\033[0m\n")
-            print("\033[93myaml_file(yaml配置文件):", cfg_path, "\033[0m\n")
+            print(f'\033[93mloader(合并后的4个输入参数，传递给nodes): {loader} \033[0m\n \
+                    \033[93mfont_path(字体): {font_path} \033[0m\n \
+                    \033[93mckpt_path(AnyText模型): {ckpt_path} \033[0m\n \
+                    \033[93mclip_path(clip模型): {clip_path} \033[0m\n \
+                    \033[93mtranslator_path(翻译模型): {translator_path} \033[0m\n \
+                    \033[93myaml_file(yaml配置文件): {cfg_path} \033[0m\n')
+            # print("\033[93mfont_path--loader[0]: loader_s[0], "\033[0m\n")
+            # print("\033[93mckpt_path--loader[1]: loader_s[1], "\033[0m\n")
+            # print("\033[93mclip_path--loader[2]: loader_s[2], "\033[0m\n")
+            # print("\033[93mtranslator_path--loader[3]: loader_s[3], "\033[0m\n")
             
         #将未分割参数写入txt，然后读取传递到到.nodes
         with open(temp_txt_path, "w", encoding="UTF-8") as text_file:
@@ -166,7 +165,7 @@ class AnyText_Pose_IMG:
         inverted_mask_image = invert_mask.reshape((-1, 1, mask.shape[-2], mask.shape[-1])).movedim(1, -1).expand(-1, -1, -1, 3)
         i = 255. * inverted_mask_image.cpu().numpy()[0]
         img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
-        print("\033[93mInput img Resolution<=768x768 Recommended(输入图像分辨率,建议<=768x768):", width, "x", height, "\033[0m\n")
+        print("\033[93mInput img Resolution<=768x768 Recommended(输入图像分辨率,建议<=768x768):", width, "x", height, "\033[0m")
         img.save(temp_img_path)
 
         return (

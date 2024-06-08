@@ -26,6 +26,7 @@ PLACE_HOLDER = '*'
 max_chars = 20
 
 comfyui_models_dir = folder_paths.models_dir
+
 class AnyText_Pipeline():
     def __init__(self, ckpt_path, clip_path, translator_path, cfg_path, use_translator, device, use_fp16,**kwargs):
         self.device = device

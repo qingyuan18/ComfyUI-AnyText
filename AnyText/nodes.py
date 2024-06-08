@@ -9,7 +9,6 @@ from modelscope.hub.snapshot_download import snapshot_download
 from .AnyText_scripts.AnyText_pipeline import AnyText_Pipeline
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
-comfyui_temp_dir = folder_paths.get_temp_directory()
 
 def pil2tensor(image):
     return torch.from_numpy(np.array(image).astype(np.float32) / 255.0).unsqueeze(0)
@@ -217,21 +216,21 @@ class AnyText:
                 "draw_pos": pos_img,
                 "ori_image": ori_image,
                 }
-        print("\033[93mImg Resolution<=768x768 Recommended(图像分辨率,建议<=768x768):", width, "x", height, "\033[0m\n")
+        print("\033[93mImg Resolution<=768x768 Recommended(图像分辨率,建议<=768x768):", {width}, "x", {height}, "\033[0m")
         if show_debug ==True:
-            print("\033[93mloader from .util(从.util输入的loader):", AnyText_Loader, "\033[0m\n")
-            print("\033[93mloader_out split form loader(分割loader得到4个参数):", loader_out, "\033[0m\n")
-            print("\033[93mFont(字体)--loader_out[0],:", loader_out[0], "\033[0m\n")
-            print("\033[93mAnyText Model(AnyText模型)--loader_out[1]:", loader_out[1], "\033[0m\n")
-            print("\033[93mclip model(clip模型)--loader_out[2]:", loader_out[2], "\033[0m\n")
-            print("\033[93mTranslator(翻译模型)--loader_out[3]:", loader_out[3], "\033[0m\n")
-            print("\033[93myaml_file(yaml配置文件):", loader_out[4], "\033[0m\n")
-            print("\033[93mChinese2English translator(中译英):", use_translator, "\033[0m\n")
-            print("\033[93mNumber of text-content to generate(需要生成的文本数量):", n_lines, "\033[0m\n")
-            print("\033[93mpos_image location(遮罩图位置):", pos_image, "\033[0m\n")
-            print("\033[93mori_image location(原图位置):", ori_image, "\033[0m\n")
-            print("\033[93mSort Position(文本生成位置排序):", sort_radio, "\033[0m\n")
-            print("\033[93mEnable revise_pos(启用位置修正):", revise_pos, "\033[0m\n")
+            print(f'\033[93mloader from .util(从.util输入的loader): {AnyText_Loader}, \033[0m\n \
+                    \033[93mloader_out split form loader(分割loader得到4个参数): {loader_out}, \033[0m\n \
+                    \033[93mFont(字体)--loader_out[0]: {loader_out[0]}, \033[0m\n \
+                    \033[93mAnyText Model(AnyText模型)--loader_out[1]: {loader_out[1]}, \033[0m\n \
+                    \033[93mclip model(clip模型)--loader_out[2]: {loader_out[2]}, \033[0m\n \
+                    \033[93mTranslator(翻译模型)--loader_out[3]: {loader_out[3]}, \033[0m\n \
+                    \033[93myaml_file(yaml配置文件): {loader_out[4]}, \033[0m\n) \
+                    \033[93mChinese2English translator(中译英): {use_translator}, \033[0m\n \
+                    \033[93mNumber of text-content to generate(需要生成的文本数量): {n_lines}, \033[0m\n \
+                    \033[93mpos_image location(遮罩图位置): {pos_image}, \033[0m\n \
+                    \033[93mori_image location(原图位置): {ori_image}, \033[0m\n \
+                    \033[93mSort Position(文本生成位置排序): {sort_radio}, \033[0m\n \
+                    \033[93mEnable revise_pos(启用位置修正): {revise_pos}, \033[0m')
         x_samples, results, rtn_code, rtn_warning, debug_info = pipe(input_data, font_path=loader_out[0], **params)
         if rtn_code < 0:
             raise Exception(f"Error in AnyText pipeline: {rtn_warning}")

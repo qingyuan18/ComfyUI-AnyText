@@ -6,6 +6,7 @@
 - This custom-node results may worse than official. 
 - Works well with official ComfyUI release using python_embed on windows in my case. Distributions from unofficial or vitural env or other OS(such as linux) may not work.
 - Work with official start.bat and AIgodlike launcher(TGD), incompatible with Aki launcher.
+- Takes 4+ seconds for importing when start ComfyUI.
 ### v2 test, more native, not remote_code mode.
 
 ## Instructions:
@@ -70,8 +71,9 @@
 - make a mask with comfyui.
 
 ## Citation:
-
-**[Repo: tyxsspa/AnyText](https://github.com/tyxsspa/AnyText)**
+### [Fork Repo: MaletteAI/anytext](https://github.com/MaletteAI/anytext)
+- V2 build native pipeline method inspired by it.
+### [Official Repo: tyxsspa/AnyText](https://github.com/tyxsspa/AnyText)
 
 ```
 @article{tuo2023anytext,

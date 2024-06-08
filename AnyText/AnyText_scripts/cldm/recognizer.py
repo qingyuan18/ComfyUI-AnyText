@@ -14,9 +14,11 @@ from .ocr_recog.RecModel import RecModel
 import torch
 import torch.nn.functional as F
 from skimage.transform._geometric import _umeyama as get_sym_mat
-import folder_paths
 
-base = os.path.dirname(folder_paths.models_dir)
+current_directory = os.path.dirname(os.path.abspath(__file__))
+ocr_txt_path = os.path.join(os.path.dirname(os.path.dirname(current_directory)), r"ocr_weights\ppocr_keys_v1.txt")
+ocr_model_path = os.path.join(os.path.dirname(os.path.dirname(current_directory)), r"ocr_weights\ppv3_rec.pth")
+
 def min_bounding_rect(img):
     ret, thresh = cv2.threshold(img, 127, 255, 0)
     contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -130,7 +132,7 @@ class TextRecognizer(object):
         self.rec_image_shape = [int(v) for v in args.rec_image_shape.split(",")]
         self.rec_batch_num = args.rec_batch_num
         self.predictor = predictor
-        self.chars = self.get_char_dict(os.path.join(base, 'custom_nodes\ComfyUI-AnyText\AnyText\ocr_weights\ppocr_keys_v1.txt'))
+        self.chars = self.get_char_dict(ocr_txt_path)
         self.char2id = {x: i for i, x in enumerate(self.chars)}
         self.is_onnx = not isinstance(self.predictor, torch.nn.Module)
         self.use_fp16 = args.use_fp16
@@ -262,11 +264,11 @@ class TextRecognizer(object):
 
 
 def main():
-    rec_model_dir = os.path.join(base, 'custom_nodes\ComfyUI-AnyText\AnyText\ocr_weights\ppv3_rec.pth')
+    rec_model_dir = ocr_model_path
     predictor = create_predictor(rec_model_dir)
     args = edict()
     args.rec_image_shape = "3, 48, 320"
-    args.rec_char_dict_path = os.path.join(base, 'custom_nodes\ComfyUI-AnyText\AnyText\ocr_weights\ppocr_keys_v1.txt')
+    args.rec_char_dict_path = ocr_txt_path
     args.rec_batch_num = 6
     text_recognizer = TextRecognizer(args, predictor)
     image_dir = './test_imgs_cn'
