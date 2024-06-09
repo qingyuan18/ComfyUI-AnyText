@@ -1,7 +1,6 @@
 import os
 import folder_paths
 import torch
-from modelscope.pipelines import pipeline
 import node_helpers
 from PIL import Image, ImageOps, ImageSequence
 import hashlib
@@ -79,10 +78,11 @@ class AnyText_loader:
             # print("\033[93mtranslator_path--loader[3]: loader_s[3], "\033[0m\n")
             
         #将未分割参数写入txt，然后读取传递到到.nodes
-        with open(temp_txt_path, "w", encoding="UTF-8") as text_file:
-            text_file.write(loader)
-        with open(temp_txt_path, "r", encoding="UTF-8") as f:
-            return (f.read(), )
+        # with open(temp_txt_path, "w", encoding="UTF-8") as text_file:
+        #     text_file.write(loader)
+        # with open(temp_txt_path, "r", encoding="UTF-8") as f:
+        #     return (f.read(), )
+        return (loader, )
 
 class AnyText_Pose_IMG:
     @classmethod
@@ -92,7 +92,6 @@ class AnyText_Pose_IMG:
         return {"required":
                     {
                         "image": (sorted(files), {"image_upload": True}),
-                        "seed": ("INT", {"default": 9999, "min": -1, "max": 99999999}),
                         },
                 }
 
@@ -114,7 +113,7 @@ class AnyText_Pose_IMG:
     FUNCTION = "AnyText_Pose_IMG"
     TITLE = "AnyText Pose IMG"
     
-    def AnyText_Pose_IMG(self, image, seed):
+    def AnyText_Pose_IMG(self, image):
         image_path = folder_paths.get_annotated_filepath(image)
         comfy_mask_pos_img_path = os.path.join(temp_img_path)
         img = node_helpers.pillow(Image.open, image_path)
@@ -198,7 +197,7 @@ class AnyText_translator:
         return {
             "required": {
                 "device": (['cpu', 'gpu'] , {"default": "gpu"}),
-                "prompt": ("STRING", {"default": "这里是单批次翻译文本输入。声明补充说，沃伦的同事都深感震惊，并且希望他能够投案自首。尽量输入单句文本，如果是多句长文本建议人工分句，否则可能出现漏译或未译等情况！！！", "multiline": True}),
+                "prompt": ("STRING", {"default": "这里是单批次翻译文本输入。\n声明补充说，沃伦的同事都深感震惊，并且希望他能够投案自首。\n尽量输入单句文本，如果是多句长文本建议人工分句，否则可能出现漏译或未译等情况！！！\n使用换行，效果可能更佳。", "multiline": True}),
                 "Batch_prompt": ("STRING", {"default": "这里是多批次翻译文本输入，使用换行进行分割。\n天上掉馅饼啦，快去看超人！！！\n飞流直下三千尺，疑似银河落九天。\n启用Batch_Newline表示输出的翻译会按换行输入进行二次换行,否则是用空格合并起来的整篇文本。", "multiline": True}),
                 "Batch_Newline" :("BOOLEAN", {"default": True}),
                 "if_Batch": ("BOOLEAN", {"default": False}),
@@ -224,6 +223,9 @@ class AnyText_translator:
             zh2en_path = os.path.join(comfyui_models_dir, 'prompt_generator', 'nlp_csanmt_translation_zh2en')
         else:
             zh2en_path = "damo/nlp_csanmt_translation_zh2en"
+        
+        if not is_module_imported('pipeline'):
+            from modelscope.pipelines import pipeline
         pipeline_ins = pipeline(task=Tasks.translation, model=zh2en_path, device=device)
         outputs = pipeline_ins(input=input_sequence)
         if if_Batch == True:
@@ -236,8 +238,18 @@ class AnyText_translator:
             results = outputs['translation']
         with open(temp_txt_path, "w", encoding="UTF-8") as text_file:
             text_file.write(results)
-        with open(temp_txt_path, "r", encoding="UTF-8") as f:
-            return (f.read(), )
+        return (results, )
+
+def is_module_imported(module_name):
+    try:
+        __import__(module_name)
+    except ImportError:
+        return False
+    else:
+        return True
+
+def pil2tensor(image):
+    return torch.from_numpy(np.array(image).astype(np.float32) / 255.0).unsqueeze(0)
 
 # Node class and display name mappings
 NODE_CLASS_MAPPINGS = {

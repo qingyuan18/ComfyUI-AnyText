@@ -1,17 +1,13 @@
 import os
 import folder_paths
 import re
-import torch
 import cv2
 import numpy as np
 import cv2
 from modelscope.hub.snapshot_download import snapshot_download
-from .AnyText_scripts.AnyText_pipeline import AnyText_Pipeline
+from .utils import is_module_imported, pil2tensor
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
-
-def pil2tensor(image):
-    return torch.from_numpy(np.array(image).astype(np.float32) / 255.0).unsqueeze(0)
 
 class AnyText:
   
@@ -167,8 +163,6 @@ class AnyText:
         else:
             raise Exception(f"width and height must be multiple of 64(宽度和高度必须为64的倍数).")
         
-        loader_out = AnyText_Loader.split("|")
-        
         if use_translator == True:
             #如果启用中译英，则提前判断本地是否存在翻译模型，没有则自动下载，以防跑半路报错。
             if os.access(os.path.join(folder_paths.models_dir, "prompt_generator", "nlp_csanmt_translation_zh2en", "tf_ckpts", "ckpt-0.data-00000-of-00001"), os.F_OK):
@@ -176,8 +170,13 @@ class AnyText:
             else:
                 snapshot_download('damo/nlp_csanmt_translation_zh2en', revision='v1.0.1')
         if device == 'cpu' or fp16 == False:
-            raise Exception(f"Only works with cuda and fp16 at now(暂时只支持cuda和fp16).")
+            print("\033[93mOnly works with CUDA+FP16 for now in this node(本插件暂时只支持CUDA+FP16).\033[0m")
+            
+        if not is_module_imported('AnyText_Pipeline'):
+            from .AnyText_scripts.AnyText_pipeline import AnyText_Pipeline
+        loader_out = AnyText_Loader.split("|")
         pipe = AnyText_Pipeline(ckpt_path=loader_out[1], clip_path=loader_out[2], translator_path=loader_out[3], cfg_path=loader_out[4], use_translator=use_translator, device=device, use_fp16=fp16)
+        
         n_lines = count_lines(prompt)
         if Random_Gen == True:
             generate_rectangles(width, height, n_lines, max_trys=500)

@@ -4,8 +4,9 @@
 
 ## Warning: 
 - This custom-node results may worse than official. 
+- Works only on **CUDA with fp16 in this node** for now.
 - Works well with official ComfyUI release using python_embed on windows in my case. Distributions from unofficial or vitural env or other OS(such as linux) may not work.
-- Takes 4+ seconds for importing when start ComfyUI.
+- Takes 0.7+ seconds for importing when start ComfyUI.
 ### v2 test, more native, not remote_code mode.
 
 ## Instructions:
