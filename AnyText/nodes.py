@@ -27,7 +27,6 @@ class AnyText:
                 "revise_pos": ("BOOLEAN", {"default": False}),
                 "img_count": ("INT", {"default": 1, "min": 1, "max": 10}),
                 "ddim_steps": ("INT", {"default": 20, "min": 1, "max": 100}),
-                "use_translator": ("BOOLEAN", {"default": False}),
                 "seed": ("INT", {"default": 9999, "min": -1, "max": 99999999}),
                 "width": ("INT", {"default": 512, "min": 128, "max": 1920, "step": 64}),
                 "height": ("INT", {"default": 512, "min": 128, "max": 1920, "step": 64}),
@@ -78,7 +77,6 @@ class AnyText:
         device,
         prompt, 
         show_debug, 
-        use_translator,
         img_count, 
         fp16,
         ddim_steps=20, 
@@ -91,6 +89,19 @@ class AnyText:
         width=512, 
         height=512,
     ):
+        def replace_between(s, start, end, replacement):
+            # 正则表达式，用以匹配从start到end之间的所有字符
+            pattern = r"%s(.*?)%s" % (re.escape(start), re.escape(end))
+            # 使用re.DOTALL标志来匹配包括换行在内的所有字符
+            return re.sub(pattern, replacement, s, flags=re.DOTALL)
+        
+        def prompt_replace(prompt):
+            #将中文符号“”中的所有内容替换为空内容，防止输入中文被检测到，从而加载翻译模型。
+            prompt = replace_between(prompt, "“", "”", "*")
+            prompt = prompt.replace('“', '"')
+            prompt = prompt.replace('”', '"')
+            return prompt
+        
         def check_overlap_polygon(rect_pts1, rect_pts2):
             poly1 = cv2.convexHull(rect_pts1)
             poly2 = cv2.convexHull(rect_pts2)
@@ -163,17 +174,25 @@ class AnyText:
         else:
             raise Exception(f"width and height must be multiple of 64(宽度和高度必须为64的倍数).")
         
-        if use_translator == True:
-            #如果启用中译英，则提前判断本地是否存在翻译模型，没有则自动下载，以防跑半路报错。
+        if not is_module_imported('AnyText_Pipeline'):
+            from .AnyText_scripts.AnyText_pipeline import AnyText_Pipeline
+        
+        #check if prompt is chinese to decide whether to load translator，检测是否为中文提示词，否则不适用翻译。
+        prompt_modify = prompt_replace(prompt)
+        bool_is_chinese = AnyText_Pipeline.is_chinese(self, prompt_modify)
+        
+        if bool_is_chinese == False:
+            use_translator = False
+        else:
+            use_translator = True
             if os.access(os.path.join(folder_paths.models_dir, "prompt_generator", "nlp_csanmt_translation_zh2en", "tf_ckpts", "ckpt-0.data-00000-of-00001"), os.F_OK):
                 pass
             else:
                 snapshot_download('damo/nlp_csanmt_translation_zh2en', revision='v1.0.1')
+        
         if device == 'cpu' or fp16 == False:
-            print("\033[93mOnly works with CUDA+FP16 for now in this node(本插件暂时只支持CUDA+FP16).\033[0m")
-            
-        if not is_module_imported('AnyText_Pipeline'):
-            from .AnyText_scripts.AnyText_pipeline import AnyText_Pipeline
+            print("\033[93mOnly works with CUDA+FP16 for now in this node(本插件目前只支持CUDA+FP16).\033[0m")
+        
         loader_out = AnyText_Loader.split("|")
         pipe = AnyText_Pipeline(ckpt_path=loader_out[1], clip_path=loader_out[2], translator_path=loader_out[3], cfg_path=loader_out[4], use_translator=use_translator, device=device, use_fp16=fp16)
         
@@ -224,7 +243,7 @@ class AnyText:
                     \033[93mclip model(clip模型)--loader_out[2]: {loader_out[2]}, \033[0m\n \
                     \033[93mTranslator(翻译模型)--loader_out[3]: {loader_out[3]}, \033[0m\n \
                     \033[93myaml_file(yaml配置文件): {loader_out[4]}, \033[0m\n) \
-                    \033[93mChinese2English translator(中译英): {use_translator}, \033[0m\n \
+                    \033[93mIs Chinese Input(是否中文输入): {use_translator}, \033[0m\n \
                     \033[93mNumber of text-content to generate(需要生成的文本数量): {n_lines}, \033[0m\n \
                     \033[93mpos_image location(遮罩图位置): {pos_image}, \033[0m\n \
                     \033[93mori_image location(原图位置): {ori_image}, \033[0m\n \
