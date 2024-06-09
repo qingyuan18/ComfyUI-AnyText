@@ -28,10 +28,8 @@ class AnyText_loader:
                 "font": (font_list, ),
                 "ckpt_name": (checkpoints_list, ),
                 "clip": (clip_list, ),
-                "clip_path_or_repo_id": ("STRING", {"default": "openai/clip-vit-large-patch14"}),
                 "translator": (translator_list, ),
-                "translator_path_or_repo_id": ("STRING", {"default": "damo/nlp_csanmt_translation_zh2en"}),
-                "show_debug": ("BOOLEAN", {"default": False}),
+                # "show_debug": ("BOOLEAN", {"default": False}),
                 }
             }
 
@@ -41,47 +39,45 @@ class AnyText_loader:
     CATEGORY = "ExtraModels/AnyText"
     TITLE = "AnyText Loader"
 
-    def AnyText_loader_fn(self, font, ckpt_name, clip, clip_path_or_repo_id, translator, translator_path_or_repo_id, show_debug):
+    def AnyText_loader_fn(self, 
+                          font, 
+                          ckpt_name, 
+                          clip, 
+                        #   clip_path_or_repo_id, 
+                          translator, 
+                        #   translator_path_or_repo_id, 
+                        #   show_debug
+                          ):
         font_path = os.path.join(comfyui_models_dir, "fonts", font)
         ckpt_path = folder_paths.get_full_path("checkpoints", ckpt_name)
         cfg_path = os.path.join(current_directory, 'models_yaml', 'anytext_sd15.yaml')
-        if clip_path_or_repo_id == "":
-            clip_path = os.path.join(comfyui_models_dir, "clip", clip)
-        else:
-            if clip != 'Auto_DownLoad':
+        # if clip_path_or_repo_id == "":
+        #     clip_path = os.path.join(comfyui_models_dir, "clip", clip)
+        # else:
+        if clip != 'Auto_DownLoad':
                 clip_path = os.path.join(comfyui_models_dir, "clip", clip)
-            else:
-                clip_path = clip_path_or_repo_id
-        if translator_path_or_repo_id == "":
-            translator_path = os.path.join(comfyui_models_dir, "prompt_generator", translator)
         else:
-            if translator != 'Auto_DownLoad':
+                clip_path = clip
+        # if translator_path_or_repo_id == "":
+        #     translator_path = os.path.join(comfyui_models_dir, "prompt_generator", translator)
+        # else:
+        if translator != 'Auto_DownLoad':
                 translator_path = os.path.join(comfyui_models_dir, "prompt_generator", translator)
-            else:
-                translator_path = translator_path_or_repo_id
+        else:
+                translator_path = translator
         
         #将输入参数合并到一个参数里面传递到.nodes
         loader = (font_path + "|" + str(ckpt_path) + "|" + clip_path + "|" + translator_path + "|" + cfg_path)
         #按|分割
         # loader_s = loader.split("|")
         
-        if show_debug == True:
-            print(f'\033[93mloader(合并后的4个输入参数，传递给nodes): {loader} \033[0m\n \
-                    \033[93mfont_path(字体): {font_path} \033[0m\n \
-                    \033[93mckpt_path(AnyText模型): {ckpt_path} \033[0m\n \
-                    \033[93mclip_path(clip模型): {clip_path} \033[0m\n \
-                    \033[93mtranslator_path(翻译模型): {translator_path} \033[0m\n \
-                    \033[93myaml_file(yaml配置文件): {cfg_path} \033[0m\n')
-            # print("\033[93mfont_path--loader[0]: loader_s[0], "\033[0m\n")
-            # print("\033[93mckpt_path--loader[1]: loader_s[1], "\033[0m\n")
-            # print("\033[93mclip_path--loader[2]: loader_s[2], "\033[0m\n")
-            # print("\033[93mtranslator_path--loader[3]: loader_s[3], "\033[0m\n")
-            
-        #将未分割参数写入txt，然后读取传递到到.nodes
-        # with open(temp_txt_path, "w", encoding="UTF-8") as text_file:
-        #     text_file.write(loader)
-        # with open(temp_txt_path, "r", encoding="UTF-8") as f:
-        #     return (f.read(), )
+        # if show_debug == True:
+        #     print(f'\033[93mloader(合并后的4个输入参数，传递给nodes): {loader} \033[0m\n \
+        #             \033[93mfont_path(字体): {font_path} \033[0m\n \
+        #             \033[93mckpt_path(AnyText模型): {ckpt_path} \033[0m\n \
+        #             \033[93mclip_path(clip模型): {clip_path} \033[0m\n \
+        #             \033[93mtranslator_path(翻译模型): {translator_path} \033[0m\n \
+        #             \033[93myaml_file(yaml配置文件): {cfg_path} \033[0m\n')
         return (loader, )
 
 class AnyText_Pose_IMG:
@@ -92,33 +88,29 @@ class AnyText_Pose_IMG:
         return {"required":
                     {
                         "image": (sorted(files), {"image_upload": True}),
+                        "seed": ("INT", {"default": 9999, "min": -1, "max": 99999999}),
                         },
                 }
 
     CATEGORY = "ExtraModels/AnyText"
     RETURN_TYPES = (
-        "ref", 
-        "pos", 
+        "AnyText_images", 
         "INT", 
         "INT", 
-        # "pos", 
         "IMAGE")
     RETURN_NAMES = (
-        "ori_img", 
-        "comfy_mask_pos_img", 
+        "AnyText_images", 
         "width", 
         "height", 
-        # "gr_mask_pose_img", 
         "mask_img")
     FUNCTION = "AnyText_Pose_IMG"
     TITLE = "AnyText Pose IMG"
     
-    def AnyText_Pose_IMG(self, image):
-        image_path = folder_paths.get_annotated_filepath(image)
-        comfy_mask_pos_img_path = os.path.join(temp_img_path)
-        img = node_helpers.pillow(Image.open, image_path)
-        # width = img.width
-        # height = img.height
+    def AnyText_Pose_IMG(self, image, seed):
+        ori_image_path = folder_paths.get_annotated_filepath(image)
+        pos_img_path = os.path.join(temp_img_path)
+        AnyText_images = ori_image_path + '|' + pos_img_path
+        img = node_helpers.pillow(Image.open, ori_image_path)
         width, height = img.size
         if width%64 == 0 and height%64 == 0:
             pass
@@ -155,10 +147,10 @@ class AnyText_Pose_IMG:
             output_masks.append(mask.unsqueeze(0))
 
         if len(output_images) > 1 and img.format not in excluded_formats:
-            output_image = torch.cat(output_images, dim=0)
+            # output_image = torch.cat(output_images, dim=0)
             output_mask = torch.cat(output_masks, dim=0)
         else:
-            output_image = output_images[0]
+            # output_image = output_images[0]
             output_mask = output_masks[0]
         invert_mask = 1.0 - output_mask
         inverted_mask_image = invert_mask.reshape((-1, 1, mask.shape[-2], mask.shape[-1])).movedim(1, -1).expand(-1, -1, -1, 3)
@@ -168,12 +160,9 @@ class AnyText_Pose_IMG:
         img.save(temp_img_path)
 
         return (
-            image_path, 
-            # ori_image,
-            comfy_mask_pos_img_path, 
+            AnyText_images, 
             width, 
             height, 
-            # gr_mask_pose_image_path, 
             inverted_mask_image)
 
     @classmethod
