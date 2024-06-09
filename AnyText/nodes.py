@@ -8,6 +8,7 @@ from modelscope.hub.snapshot_download import snapshot_download
 from .utils import is_module_imported, pil2tensor
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
+Random_Gen_Mask_path = os.path.join(current_directory, "temp_dir",  "AnyText_random_mask_pos_img.png")
 
 class AnyText:
   
@@ -157,7 +158,7 @@ class AnyText:
                     continue
                 n_pass += 1
                 img = cv2.fillPoly(img, [rect_pts], 255)
-                cv2.imwrite(os.path.join(current_directory, "temp_dir",  "AnyText_mask_pos_img.png"), 255-img[..., ::-1])
+                cv2.imwrite(Random_Gen_Mask_path, 255-img[..., ::-1])
                 rectangles.append(rect_pts)
                 if n_pass == n:
                     break
@@ -206,7 +207,7 @@ class AnyText:
         n_lines = count_lines(prompt)
         if Random_Gen == True:
             generate_rectangles(width, height, n_lines, max_trys=500)
-            pos_img = pos
+            pos_img = Random_Gen_Mask_path
         else:
             pos_img = pos
             

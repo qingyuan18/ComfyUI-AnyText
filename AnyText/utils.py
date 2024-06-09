@@ -9,7 +9,7 @@ import numpy as np
 current_directory = os.path.dirname(os.path.abspath(__file__))
 comfyui_models_dir = folder_paths.models_dir
 temp_txt_path = os.path.join(current_directory, "temp_dir", "AnyText_temp.txt")
-temp_img_path = os.path.join(current_directory, "temp_dir", "AnyText_mask_pos_img.png")
+temp_img_path = os.path.join(current_directory, "temp_dir", "AnyText_manual_mask_pos_img.png")
 
 class AnyText_loader:
     @classmethod
@@ -88,7 +88,6 @@ class AnyText_Pose_IMG:
         return {"required":
                     {
                         "image": (sorted(files), {"image_upload": True}),
-                        "seed": ("INT", {"default": 9999, "min": -1, "max": 99999999}),
                         },
                 }
 
@@ -106,7 +105,7 @@ class AnyText_Pose_IMG:
     FUNCTION = "AnyText_Pose_IMG"
     TITLE = "AnyText Pose IMG"
     
-    def AnyText_Pose_IMG(self, image, seed):
+    def AnyText_Pose_IMG(self, image):
         ori_image_path = folder_paths.get_annotated_filepath(image)
         pos_img_path = os.path.join(temp_img_path)
         AnyText_images = ori_image_path + '|' + pos_img_path
