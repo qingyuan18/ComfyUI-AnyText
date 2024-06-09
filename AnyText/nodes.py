@@ -89,17 +89,24 @@ class AnyText:
         width=512, 
         height=512,
     ):
-        def replace_between(s, start, end, replacement):
-            # 正则表达式，用以匹配从start到end之间的所有字符
-            pattern = r"%s(.*?)%s" % (re.escape(start), re.escape(end))
-            # 使用re.DOTALL标志来匹配包括换行在内的所有字符
-            return re.sub(pattern, replacement, s, flags=re.DOTALL)
+        # def replace_between(s, start, end, replacement):
+        #     # 正则表达式，用以匹配从start到end之间的所有字符
+        #     pattern = r"%s(.*?)%s" % (re.escape(start), re.escape(end))
+        #     # 使用re.DOTALL标志来匹配包括换行在内的所有字符
+        #     return re.sub(pattern, replacement, s, flags=re.DOTALL)
         
         def prompt_replace(prompt):
-            #将中文符号“”中的所有内容替换为空内容，防止输入中文被检测到，从而加载翻译模型。
-            prompt = replace_between(prompt, "“", "”", "*")
+            #将中文符号“”中的所有内容替换为空内容。
+            # prompt = replace_between(prompt, "“", "”", "*")
             prompt = prompt.replace('“', '"')
             prompt = prompt.replace('”', '"')
+            p = '"(.*?)"'
+            strs = re.findall(p, prompt)
+            if len(strs) == 0:
+                strs = [' ']
+            else:
+                for s in strs:
+                    prompt = prompt.replace(f'"{s}"', f' * ', 1)
             return prompt
         
         def check_overlap_polygon(rect_pts1, rect_pts2):
