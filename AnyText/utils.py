@@ -239,6 +239,10 @@ def is_module_imported(module_name):
 def pil2tensor(image):
     return torch.from_numpy(np.array(image).astype(np.float32) / 255.0).unsqueeze(0)
 
+def is_folder_exist(folder_path):
+    result = os.path.exists(folder_path)
+    return result
+
 # Node class and display name mappings
 NODE_CLASS_MAPPINGS = {
     "AnyText_loader": AnyText_loader,
