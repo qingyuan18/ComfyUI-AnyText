@@ -13,11 +13,10 @@ from .cldm.ddim_hacked import DDIMSampler
 from .AnyText_t3_dataset import draw_glyph, draw_glyph2
 from .AnyText_pipeline_util import check_channels, resize_image
 from pytorch_lightning import seed_everything
-from modelscope.pipelines import pipeline
-from modelscope.utils.constant import Tasks
 from .AnyText_bert_tokenizer import BasicTokenizer
 import folder_paths
 from huggingface_hub import hf_hub_download
+from ..utils import is_module_imported
 
 checker = BasicTokenizer()
 BBOX_MAX_NUM = 8
@@ -61,6 +60,10 @@ class AnyText_Pipeline():
                 self.zh2en_path = self.translator_path
             else:
                 self.zh2en_path = "damo/nlp_csanmt_translation_zh2en"
+            if not is_module_imported('pipeline'):
+                from modelscope.pipelines import pipeline
+            if not is_module_imported('Tasks'):
+                from modelscope.utils.constant import Tasks
             self.trans_pipe = pipeline(task=Tasks.translation, model=self.zh2en_path, device=self.device)
         else:
             self.trans_pipe = None

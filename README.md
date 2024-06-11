@@ -3,10 +3,10 @@
 ## Original Repo: [AnyText: Multilingual Visual Text Generation And Editing](https://github.com/tyxsspa/AnyText)
 
 ## Warning: 
+- **Do not install modelscope & tensorflow packages if translator not needed!!!**
 - This custom-node results maybe worse than official. 
 - Tested only on **cuda with fp16** , you can try others options but maybe not work.
 - Tested with **Official_ComfyUI_Stable_Release** using **python_embed** on **windows** in my case. Distributions from unofficial or vitural env or other OS(such as linux) maybe not work.
-- Takes 0.7+ seconds for importing when start ComfyUI.
 ### v2 test, more native, not remote_code mode.
 
 ## Instructions:

@@ -9,5 +9,3 @@ huggingface_hub
 pytorch_lightning
 torch
 ujson
-modelscope
-tensorflow

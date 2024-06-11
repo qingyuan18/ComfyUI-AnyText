@@ -4,7 +4,6 @@ import re
 import cv2
 import numpy as np
 import cv2
-from modelscope.hub.snapshot_download import snapshot_download
 from .utils import is_module_imported, pil2tensor, get_device_by_name
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
@@ -181,6 +180,8 @@ class AnyText:
             if os.access(os.path.join(folder_paths.models_dir, "prompt_generator", "nlp_csanmt_translation_zh2en", "tf_ckpts", "ckpt-0.data-00000-of-00001"), os.F_OK):
                 pass
             else:
+                if not is_module_imported('snapshot_download'):
+                    from modelscope.hub.snapshot_download import snapshot_download
                 snapshot_download('damo/nlp_csanmt_translation_zh2en', revision='v1.0.1')
         
         device = get_device_by_name(device)

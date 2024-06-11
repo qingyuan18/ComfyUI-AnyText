@@ -1,4 +1,5 @@
 import os
+# import sys
 import folder_paths
 import torch
 import node_helpers
@@ -156,7 +157,6 @@ class AnyText_Pose_IMG:
             return "Invalid image file: {}".format(image)
         return True
 
-from modelscope.utils.constant import Tasks
 class AnyText_translator:
     @classmethod
     def INPUT_TYPES(cls):
@@ -192,6 +192,8 @@ class AnyText_translator:
         
         if not is_module_imported('pipeline'):
             from modelscope.pipelines import pipeline
+        if not is_module_imported():
+            from modelscope.utils.constant import Tasks
         pipeline_ins = pipeline(task=Tasks.translation, model=zh2en_path, device=device)
         outputs = pipeline_ins(input=input_sequence)
         if if_Batch == True:
