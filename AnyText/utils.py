@@ -94,13 +94,13 @@ class AnyText_Pose_IMG:
     CATEGORY = "ExtraModels/AnyText"
     RETURN_TYPES = (
         "AnyText_images", 
-        "INT", 
-        "INT", 
+        # "INT", 
+        # "INT", 
         "IMAGE")
     RETURN_NAMES = (
         "AnyText_images", 
-        "width", 
-        "height", 
+        # "width", 
+        # "height", 
         "mask_img")
     FUNCTION = "AnyText_Pose_IMG"
     TITLE = "AnyText Pose IMG"
@@ -111,10 +111,10 @@ class AnyText_Pose_IMG:
         AnyText_images = ori_image_path + '|' + pos_img_path
         img = node_helpers.pillow(Image.open, ori_image_path)
         width, height = img.size
-        if width%64 == 0 and height%64 == 0:
-            pass
-        else:
-            raise Exception(f"Input pos_img resolution must be multiple of 64(输入的pos_img图片分辨率必须为64的倍数).\n")
+        # if width%64 == 0 and height%64 == 0:
+        #     pass
+        # else:
+        #     raise Exception(f"Input pos_img resolution must be multiple of 64(输入的pos_img图片分辨率必须为64的倍数).\n")
         output_images = []
         output_masks = []
         w, h = None, None
@@ -160,8 +160,8 @@ class AnyText_Pose_IMG:
 
         return (
             AnyText_images, 
-            width, 
-            height, 
+            # width, 
+            # height, 
             inverted_mask_image)
 
     @classmethod

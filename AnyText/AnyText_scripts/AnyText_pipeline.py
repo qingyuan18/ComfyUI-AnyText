@@ -99,6 +99,7 @@ class AnyText_Pipeline():
         ori_image = input_tensor.get('ori_image')
 
         mode = forward_params.get('mode')
+        Random_Gen = forward_params.get('Random_Gen')
         sort_priority = forward_params.get('sort_priority', '↕')
         show_debug = forward_params.get('show_debug', False)
         revise_pos = forward_params.get('revise_pos', False)
@@ -117,7 +118,15 @@ class AnyText_Pipeline():
             return None, -1, "You have input Chinese prompt but the translator is not loaded!", ""
         n_lines = len(texts)
         if mode in ['text-generation', 'gen']:
-            edit_image = np.ones((h, w, 3)) * 127.5  # empty mask image
+            if Random_Gen == True:
+                edit_image = np.ones((h, w, 3)) * 127.5  # empty mask image
+                edit_image = resize_image(edit_image, max_length=768)
+                h, w = edit_image.shape[:2]
+            else:
+                edit_image = cv2.imread(draw_pos)[..., ::-1]
+                edit_image = resize_image(edit_image, max_length=768)
+                h, w = edit_image.shape[:2]
+                edit_image = np.ones((h, w, 3)) * 127.5  # empty mask image
         elif mode in ['text-editing', 'edit']:
             if draw_pos is None or ori_image is None:
                 return None, -1, "Reference image and position image are needed for text editing!", ""
@@ -137,6 +146,8 @@ class AnyText_Pipeline():
             pos_imgs = np.zeros((w, h, 1))
         if isinstance(draw_pos, str):
             draw_pos = cv2.imread(draw_pos)[..., ::-1]
+            draw_pos = resize_image(draw_pos, max_length=768)
+            draw_pos = cv2.resize(draw_pos, (w, h))
             assert draw_pos is not None, f"Can't read draw_pos image from{draw_pos}!"
             pos_imgs = 255-draw_pos
         elif isinstance(draw_pos, torch.Tensor):

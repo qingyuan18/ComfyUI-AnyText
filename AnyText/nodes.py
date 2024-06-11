@@ -29,8 +29,8 @@ class AnyText:
                 "img_count": ("INT", {"default": 1, "min": 1, "max": 10}),
                 "ddim_steps": ("INT", {"default": 20, "min": 1, "max": 100}),
                 "seed": ("INT", {"default": 9999, "min": -1, "max": 99999999}),
-                "width": ("INT", {"default": 512, "min": 128, "max": 1920, "step": 64}),
-                "height": ("INT", {"default": 512, "min": 128, "max": 1920, "step": 64}),
+                "nonEdit_random_gen_width": ("INT", {"default": 512, "min": 128, "max": 1920, "step": 64}),
+                "nonEdit_random_gen_height": ("INT", {"default": 512, "min": 128, "max": 1920, "step": 64}),
                 # "width": ("INT", {"forceInput": True}),
                 # "height": ("INT", {"forceInput": True}),
                 "Random_Gen": ("BOOLEAN", {"default": False}),
@@ -85,8 +85,8 @@ class AnyText:
         eta=0.0, 
         a_prompt="", 
         n_prompt="", 
-        width=512, 
-        height=512,
+        nonEdit_random_gen_width=512, 
+        nonEdit_random_gen_height=512,
     ):
         def prompt_replace(prompt):
             prompt = prompt.replace('“', '"')
@@ -167,10 +167,10 @@ class AnyText:
                 raise Exception(f'Failed in auto generate positions after {attempts} attempts, try again!')
             return img
         
-        if width%64 == 0 and height%64 == 0:
-            pass
-        else:
-            raise Exception(f"width and height must be multiple of 64(宽度和高度必须为64的倍数).")
+        # if width%64 == 0 and height%64 == 0:
+        #     pass
+        # else:
+        #     raise Exception(f"width and height must be multiple of 64(宽度和高度必须为64的倍数).")
         
         if not is_module_imported('AnyText_Pipeline'):
             from .AnyText_scripts.AnyText_pipeline import AnyText_Pipeline
@@ -206,7 +206,7 @@ class AnyText:
             
         n_lines = count_lines(prompt)
         if Random_Gen == True:
-            generate_rectangles(width, height, n_lines, max_trys=500)
+            generate_rectangles(nonEdit_random_gen_width, nonEdit_random_gen_height, n_lines, max_trys=500)
             pos_img = Random_Gen_Mask_path
         else:
             pos_img = pos
@@ -218,13 +218,14 @@ class AnyText:
         
         params = {
             "mode": mode,
+            "Random_Gen": Random_Gen,
             "sort_priority": sort_radio,
             "revise_pos": revise_pos,
             # "show_debug": show_debug,
             "image_count": img_count,
             "ddim_steps": ddim_steps - 1,
-            "image_width": width,
-            "image_height": height,
+            "image_width": nonEdit_random_gen_width,
+            "image_height": nonEdit_random_gen_height,
             "strength": strength,
             "cfg_scale": cfg_scale,
             "eta": eta,
@@ -238,7 +239,7 @@ class AnyText:
                 "draw_pos": pos_img,
                 "ori_image": ori_image,
                 }
-        print("\033[93mImg Resolution<=768x768 Recommended(图像分辨率,建议<=768x768):", {width}, "x", {height}, "\033[0m")
+        print("\033[93mImg Resolution<=768x768 Recommended(图像分辨率,建议<=768x768):", {nonEdit_random_gen_width}, "x", {nonEdit_random_gen_height}, "\033[0m")
         # if show_debug ==True:
         #     print(f'\033[93mloader from .util(从.util输入的loader): {AnyText_Loader}, \033[0m\n \
         #             \033[93mloader_out split form loader(分割loader得到4个参数): {loader_out}, \033[0m\n \
