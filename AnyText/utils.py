@@ -221,6 +221,21 @@ def is_folder_exist(folder_path):
     result = os.path.exists(folder_path)
     return result
 
+def get_device_by_name(device):
+    if device == 'auto':
+        try:
+            device = "cpu"
+            if torch.cuda.is_available():
+                device = "cuda"
+            elif torch.backends.mps.is_available():
+                device = "mps"
+            elif torch.xpu.is_available():
+                device = "xpu"
+        except:
+                raise AttributeError("What's your device(到底用什么设备跑的)？")
+    print("\033[93mUse Device(使用设备):", device, "\033[0m")
+    return device
+
 # Node class and display name mappings
 NODE_CLASS_MAPPINGS = {
     "AnyText_loader": AnyText_loader,

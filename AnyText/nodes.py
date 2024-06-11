@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 import cv2
 from modelscope.hub.snapshot_download import snapshot_download
-from .utils import is_module_imported, pil2tensor
+from .utils import is_module_imported, pil2tensor, get_device_by_name
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 Random_Gen_Mask_path = os.path.join(current_directory, "temp_dir",  "AnyText_random_mask_pos_img.png")
@@ -34,8 +34,8 @@ class AnyText:
                 # "width": ("INT", {"forceInput": True}),
                 # "height": ("INT", {"forceInput": True}),
                 "Random_Gen": ("BOOLEAN", {"default": False}),
-                # "fp16": ("BOOLEAN", {"default": True}),
-                # "device": (["cuda", "cpu"],{"default": "cuda"}), 
+                "fp16": ("BOOLEAN", {"default": True}),
+                "device": (["auto", "cuda", "cpu", "mps", "xpu"],{"default": "auto"}), 
                 "strength": ("FLOAT", {
                     "default": 1.00,
                     "min": -999999,
@@ -76,8 +76,8 @@ class AnyText:
         prompt, 
         # show_debug, 
         img_count, 
-        # fp16,
-        # device,
+        fp16,
+        device,
         ddim_steps=20, 
         strength=1, 
         cfg_scale=9, 
@@ -183,11 +183,9 @@ class AnyText:
             else:
                 snapshot_download('damo/nlp_csanmt_translation_zh2en', revision='v1.0.1')
         
-        # if device == 'cpu' or fp16 == False:
-        #     print("\033[93mOnly works with CUDA+FP16 for now in this node(本插件目前只支持CUDA+FP16).\033[0m")
-        
+        device = get_device_by_name(device)
         loader_out = AnyText_Loader.split("|")
-        pipe = AnyText_Pipeline(ckpt_path=loader_out[1], clip_path=loader_out[2], translator_path=loader_out[3], cfg_path=loader_out[4], use_translator=use_translator, device='cuda', use_fp16=True)
+        pipe = AnyText_Pipeline(ckpt_path=loader_out[1], clip_path=loader_out[2], translator_path=loader_out[3], cfg_path=loader_out[4], use_translator=use_translator, device=device, use_fp16=fp16)
         
         AnyText_images = AnyText_images.split("|")
         ori = AnyText_images[0]
@@ -213,6 +211,7 @@ class AnyText:
         
         params = {
             "mode": mode,
+            "use_fp16": fp16,
             "Random_Gen": Random_Gen,
             "sort_priority": sort_radio,
             "revise_pos": revise_pos,

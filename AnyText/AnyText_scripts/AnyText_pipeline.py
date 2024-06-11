@@ -27,10 +27,9 @@ max_chars = 20
 comfyui_models_dir = folder_paths.models_dir
 
 class AnyText_Pipeline():
-    def __init__(self, ckpt_path, clip_path, translator_path, cfg_path, use_translator, device, use_fp16,**kwargs):
+    def __init__(self, ckpt_path, clip_path, translator_path, cfg_path, use_translator, device, use_fp16):
         self.device = device
         self.use_fp16 = use_fp16
-        # self.device = device
         self.translator_path = translator_path
         self.cfg_path = cfg_path
         if ckpt_path != 'None':
@@ -56,20 +55,17 @@ class AnyText_Pipeline():
         self.model.load_state_dict(load_state_dict(self.ckpt_path, location='cpu'), strict=False)
         self.model = self.model.eval().to(self.device)
         self.ddim_sampler = DDIMSampler(self.model, device=self.device)
-        # if self.use_translator == 'Original':
         if use_translator == True:
             #加载中译英模型，模型地址https://modelscope.cn/models/iic/nlp_csanmt_translation_zh2en
             if "Auto_DownLoad" not in translator_path:
                 self.zh2en_path = self.translator_path
             else:
                 self.zh2en_path = "damo/nlp_csanmt_translation_zh2en"
-            self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
             self.trans_pipe = pipeline(task=Tasks.translation, model=self.zh2en_path, device=self.device)
         else:
             self.trans_pipe = None
     
     def __call__(self, input_tensor, font_path, **forward_params):
-        self.use_fp16 = True
         if "Auto_DownLoad" not in font_path:
             font_path = font_path
         else:
@@ -91,6 +87,7 @@ class AnyText_Pipeline():
         ori_image = input_tensor.get('ori_image')
 
         mode = forward_params.get('mode')
+        self.use_fp16 = forward_params.get('use_fp16')
         Random_Gen = forward_params.get('Random_Gen')
         sort_priority = forward_params.get('sort_priority', '↕')
         show_debug = forward_params.get('show_debug', False)
@@ -255,6 +252,7 @@ class AnyText_Pipeline():
                            \033[93mImage Count(生成数量): {img_count}\n\033[0m \
                            \033[93mSeed(种子): {seed}\n\033[0m \
                            \033[93mUse FP16(使用FP16): {self.use_fp16}\n\033[0m \
+                           \033[93mUse Device(使用设备): {self.device}\n\033[0m \
                            \033[93mCost Time(生成耗时): {(time.time()-tic):.2f}s\033[0m'
         rst_code = 1 if str_warning else 0
         return x_samples, results, rst_code, str_warning, debug_info
