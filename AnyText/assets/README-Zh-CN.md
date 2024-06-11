@@ -14,7 +14,7 @@
 - 手绘遮罩数量必须>=你想生成文字的数量，每一个“”代表一个文字数量，“”里面内容不限长度,否则会报错 ["not enough values to unpack"](https://github.com/zmwv823/ComfyUI-AnyText/issues/7).
 - 个人电脑环境: ComfyUI官方整合包+(ComfyUI_windows_portable\ComfyUI下)脚本运行+python_embed+win10+py311+torch2.3.0+cu121+rtx3050laptop(4GB).
 - pillow>=9.5.0(10.3.0)大部分包都是最新版本。
-- **输入的图片分辨率必须为64的倍数。** 输入图片最大分辨率建议768x768。
+- **支持任意分辨率图片输入，但是会被缩放到<=768，输出图片也会被限制到<=768(官方策略)。**
 - **如果font、ckpt_name、clip、translator设置为Auto_DownLoad，则会自动下载默认模型到特定目录。如果模型已经存在，则会自动加载。**
 - 运行本插件节点时，如果本地没有模型文件，会自动从笑脸(huggingface)下载AnyText模型(fp16: 2.66 GB)到"ComfyUI\models\checkpoints\15\anytext_v1.1.safetensors"。
 - 你可以手动从[魔搭(modelscope)-AnyText-FP32-5.73 GB](https://modelscope.cn/models/iic/cv_anytext_text_generation_editing/file/view/master?fileName=anytext_v1.1.ckpt&status=2)下载，然后放到**ComfyUI\models\checkpoints\15**。
@@ -71,9 +71,9 @@
 
 - 根据提示词内字符串数量自动生成遮罩，启用这个选项时pos_img输入不生效。
 
-### comfy_mask_pos_img:
+### nonEdit_random_gen_width & nonEdit_random_gen_height:
 
-- 使用ComfyUI原生生成的遮罩。
+- 当**text-generation和Random_Gen**一起使用时控制图片尺寸，仅此时生效。
 
 ## 鸣谢:
 ### [Fork Repo: MaletteAI/anytext](https://github.com/MaletteAI/anytext)

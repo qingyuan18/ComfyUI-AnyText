@@ -43,24 +43,16 @@ class AnyText_loader:
                           font, 
                           ckpt_name, 
                           clip, 
-                        #   clip_path_or_repo_id, 
                           translator, 
-                        #   translator_path_or_repo_id, 
                         #   show_debug
                           ):
         font_path = os.path.join(comfyui_models_dir, "fonts", font)
         ckpt_path = folder_paths.get_full_path("checkpoints", ckpt_name)
         cfg_path = os.path.join(current_directory, 'models_yaml', 'anytext_sd15.yaml')
-        # if clip_path_or_repo_id == "":
-        #     clip_path = os.path.join(comfyui_models_dir, "clip", clip)
-        # else:
         if clip != 'Auto_DownLoad':
                 clip_path = os.path.join(comfyui_models_dir, "clip", clip)
         else:
                 clip_path = clip
-        # if translator_path_or_repo_id == "":
-        #     translator_path = os.path.join(comfyui_models_dir, "prompt_generator", translator)
-        # else:
         if translator != 'Auto_DownLoad':
                 translator_path = os.path.join(comfyui_models_dir, "prompt_generator", translator)
         else:
@@ -68,8 +60,6 @@ class AnyText_loader:
         
         #将输入参数合并到一个参数里面传递到.nodes
         loader = (font_path + "|" + str(ckpt_path) + "|" + clip_path + "|" + translator_path + "|" + cfg_path)
-        #按|分割
-        # loader_s = loader.split("|")
         
         # if show_debug == True:
         #     print(f'\033[93mloader(合并后的4个输入参数，传递给nodes): {loader} \033[0m\n \
@@ -94,13 +84,9 @@ class AnyText_Pose_IMG:
     CATEGORY = "ExtraModels/AnyText"
     RETURN_TYPES = (
         "AnyText_images", 
-        # "INT", 
-        # "INT", 
         "IMAGE")
     RETURN_NAMES = (
         "AnyText_images", 
-        # "width", 
-        # "height", 
         "mask_img")
     FUNCTION = "AnyText_Pose_IMG"
     TITLE = "AnyText Pose IMG"
@@ -110,11 +96,6 @@ class AnyText_Pose_IMG:
         pos_img_path = os.path.join(temp_img_path)
         AnyText_images = ori_image_path + '|' + pos_img_path
         img = node_helpers.pillow(Image.open, ori_image_path)
-        width, height = img.size
-        # if width%64 == 0 and height%64 == 0:
-        #     pass
-        # else:
-        #     raise Exception(f"Input pos_img resolution must be multiple of 64(输入的pos_img图片分辨率必须为64的倍数).\n")
         output_images = []
         output_masks = []
         w, h = None, None
@@ -155,13 +136,10 @@ class AnyText_Pose_IMG:
         inverted_mask_image = invert_mask.reshape((-1, 1, mask.shape[-2], mask.shape[-1])).movedim(1, -1).expand(-1, -1, -1, 3)
         i = 255. * inverted_mask_image.cpu().numpy()[0]
         img = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
-        print("\033[93mInput img Resolution<=768x768 Recommended(输入图像分辨率,建议<=768x768):", width, "x", height, "\033[0m")
         img.save(temp_img_path)
 
         return (
             AnyText_images, 
-            # width, 
-            # height, 
             inverted_mask_image)
 
     @classmethod

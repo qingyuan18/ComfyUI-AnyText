@@ -1,23 +1,4 @@
-import datetime
-import os
 import cv2
-
-
-def save_images(img_list, folder):
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-    now = datetime.datetime.now()
-    date_str = now.strftime("%Y-%m-%d")
-    folder_path = os.path.join(folder, date_str)
-    if not os.path.exists(folder_path):
-        os.makedirs(folder_path)
-    time_str = now.strftime("%H_%M_%S")
-    for idx, img in enumerate(img_list):
-        image_number = idx + 1
-        filename = f"{time_str}_{image_number}.jpg"
-        save_path = os.path.join(folder_path, filename)
-        cv2.imwrite(save_path, img[..., ::-1])
-
 
 def check_channels(image):
     channels = image.shape[2] if len(image.shape) == 3 else 1

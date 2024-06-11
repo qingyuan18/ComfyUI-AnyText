@@ -15,7 +15,6 @@ from .AnyText_pipeline_util import check_channels, resize_image
 from pytorch_lightning import seed_everything
 from modelscope.pipelines import pipeline
 from modelscope.utils.constant import Tasks
-# from modelscope.hub.snapshot_download import snapshot_download
 from .AnyText_bert_tokenizer import BasicTokenizer
 import folder_paths
 from huggingface_hub import hf_hub_download
@@ -37,8 +36,6 @@ class AnyText_Pipeline():
         if ckpt_path != 'None':
             ckpt_path = ckpt_path
         else:
-            #第一个方法为从魔搭modelscope(https://modelscope.cn/models/iic/cv_anytext_text_generation_editing/)下载v1.1.1版本下FP32版本的anytext_v1.1.ckpt到指定文件夹ComfyUI\models\checkpoints\15。第二个方法从笑脸huggingface(https://huggingface.co/Sanster/AnyText)下载FP16版本的pytorch_model.fp16.safetensors到指定文件夹ComfyUI\models\checkpoints\15，然后重命名为anytext_v1.1.safetensors
-            # ckpt_path = model_file_download(model_id='damo/cv_anytext_text_generation_editing',file_path='anytext_v1.1.ckpt', cache_dir=os.path.join(folder_paths.models_dir, "checkpoints", "15"), revision='v1.1.1')
             if os.access(os.path.join(comfyui_models_dir, "checkpoints", "15", "anytext_v1.1.safetensors"), os.F_OK):
                 ckpt_path = os.path.join(comfyui_models_dir, "checkpoints", "15", "anytext_v1.1.safetensors")
             else:
@@ -65,11 +62,6 @@ class AnyText_Pipeline():
             if "Auto_DownLoad" not in translator_path:
                 self.zh2en_path = self.translator_path
             else:
-                #第一个方法为下载到指定文件夹ComfyUI\models\prompt_generator，第二个方法为下载到C:\Users\username\.cache\modelscope\hub\damo
-                # zh2en_path = snapshot_download(
-                #     'damo/nlp_csanmt_translation_zh2en', 
-                #     cache_dir=os.path.join(folder_paths.models_dir, "prompt_generator"), 
-                #     revision='v1.0.1')
                 self.zh2en_path = "damo/nlp_csanmt_translation_zh2en"
             self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
             self.trans_pipe = pipeline(task=Tasks.translation, model=self.zh2en_path, device=self.device)
@@ -245,9 +237,6 @@ class AnyText_Pipeline():
         x_samples = self.model.decode_first_stage(samples)
         x_samples = (einops.rearrange(x_samples, 'b c h w -> b h w c') * 127.5 + 127.5).cpu().numpy().clip(0, 255).astype(np.uint8)
         results = [x_samples[i] for i in range(img_count)]
-        if mode == 'edit' and False:  # replace backgound in text editing but not ideal yet
-            results = [r*np_hint+edit_image*(1-np_hint) for r in results]
-            results = [r.clip(0, 255).astype(np.uint8) for r in results]
         if len(gly_pos_imgs) > 0 and show_debug:
             glyph_bs = np.stack(gly_pos_imgs, axis=2)
             glyph_img = np.sum(glyph_bs, axis=2) * 255

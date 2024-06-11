@@ -14,7 +14,7 @@
 - Numbers of draw_masks must >= nunbers of string_content (in the "") we want to generate, or it will raise an error ["not enough values to unpack"](https://github.com/zmwv823/ComfyUI-AnyText/issues/7).
 - works on my pc: ComfyUI official release+(ComfyUI_windows_portable\ComfyUI)start with powershell+python_embed+win10+py311+torch2.3.0+cu121+rtx3050laptop(4GB).
 - pillow>=9.5.0(10.3.0) Most packages are the newest.
-- **Input image resolution must be multiple of 64.** Input image max resolution 768x768 Recommended.
+- **Accept any resolution image input, but will resized to <=768, output images will limited to <=768.(Official method)** 
 - **If font、ckpt_name、clip、translator set to Auto_DownLoad, default models will automtically download to specified directory. Models will loaded if models already exist.**
 - AnyText model will automatically download into "ComfyUI\models\checkpoints\15\anytext_v1.1.safetensors" from huggingface(fp16: 2.66 GB) when first time executing the node if the model file dose not exist.
 - You can download [AnyText-FP32-5.73 GB](https://modelscope.cn/models/iic/cv_anytext_text_generation_editing/file/view/master?fileName=anytext_v1.1.ckpt&status=2) from modelscope,(fp32 5.73 GB).Then put it into **ComfyUI\models\checkpoints\15**.
@@ -67,9 +67,9 @@
 
 - Automatically generate mask as pos_img based on the number of text-content("string"). With this checked the pos_img input dosen't work
 
-### comfy_mask_pos_img:
+### nonEdit_random_gen_width & nonEdit_random_gen_height:
 
-- make a mask with comfyui.
+- For image size control with **text-generation and Random_Gen** together, works only in this situation.
 
 ## Citation:
 ### [Fork Repo: MaletteAI/anytext](https://github.com/MaletteAI/anytext)

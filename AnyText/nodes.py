@@ -167,11 +167,6 @@ class AnyText:
                 raise Exception(f'Failed in auto generate positions after {attempts} attempts, try again!')
             return img
         
-        # if width%64 == 0 and height%64 == 0:
-        #     pass
-        # else:
-        #     raise Exception(f"width and height must be multiple of 64(宽度和高度必须为64的倍数).")
-        
         if not is_module_imported('AnyText_Pipeline'):
             from .AnyText_scripts.AnyText_pipeline import AnyText_Pipeline
         
@@ -239,7 +234,6 @@ class AnyText:
                 "draw_pos": pos_img,
                 "ori_image": ori_image,
                 }
-        print("\033[93mImg Resolution<=768x768 Recommended(图像分辨率,建议<=768x768):", {nonEdit_random_gen_width}, "x", {nonEdit_random_gen_height}, "\033[0m")
         # if show_debug ==True:
         #     print(f'\033[93mloader from .util(从.util输入的loader): {AnyText_Loader}, \033[0m\n \
         #             \033[93mloader_out split form loader(分割loader得到4个参数): {loader_out}, \033[0m\n \
