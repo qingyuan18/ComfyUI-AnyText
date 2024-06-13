@@ -90,7 +90,7 @@ class AnyText_Pipeline():
         ori_image = input_tensor.get('ori_image')
 
         mode = forward_params.get('mode')
-        self.use_fp16 = forward_params.get('use_fp16')
+        use_fp16 = forward_params.get('use_fp16')
         Random_Gen = forward_params.get('Random_Gen')
         sort_priority = forward_params.get('sort_priority', '↕')
         show_debug = forward_params.get('show_debug', False)
@@ -208,9 +208,9 @@ class AnyText_Pipeline():
                 gly_line = np.zeros((80, 512, 1))
                 gly_pos_imgs += [np.zeros((h*gly_scale, w*gly_scale, 1))]  # for show
             pos = pre_pos[i]
-            info['glyphs'] += [self.arr2tensor(glyphs, img_count)]
-            info['gly_line'] += [self.arr2tensor(gly_line, img_count)]
-            info['positions'] += [self.arr2tensor(pos, img_count)]
+            info['glyphs'] += [self.arr2tensor(glyphs, img_count, use_fp16)]
+            info['gly_line'] += [self.arr2tensor(gly_line, img_count, use_fp16)]
+            info['positions'] += [self.arr2tensor(pos, img_count, use_fp16)]
         # get masked_x
         masked_img = ((edit_image.astype(np.float32) / 127.5) - 1.0)*(1-np_hint)
         masked_img = np.transpose(masked_img, (2, 0, 1))
@@ -223,7 +223,7 @@ class AnyText_Pipeline():
             masked_x = masked_x.half()
         info['masked_x'] = torch.cat([masked_x for _ in range(img_count)], dim=0)
 
-        hint = self.arr2tensor(np_hint, img_count)
+        hint = self.arr2tensor(np_hint, img_count, use_fp16)
         cond = self.model.get_learned_conditioning(dict(c_concat=[hint], c_crossattn=[[prompt + ' , ' + a_prompt] * img_count], text_info=info))
         un_cond = self.model.get_learned_conditioning(dict(c_concat=[hint], c_crossattn=[[n_prompt] * img_count], text_info=info))
         shape = (4, h // 8, w // 8)
@@ -317,7 +317,8 @@ class AnyText_Pipeline():
         cv2.drawContours(image, [poly], -1, 255, -1)
         return poly, image
 
-    def arr2tensor(self, arr, bs):
+    def arr2tensor(self, arr, bs, use_fp16):
+        self.use_fp16 = use_fp16
         arr = np.transpose(arr, (2, 0, 1))
         _arr = torch.from_numpy(arr.copy()).float().to(self.device)
         if self.use_fp16:
