@@ -66,7 +66,7 @@
 
 ### Random_Gen: automatic generate mask as pos_img.
 
-- Automatically generate mask as pos_img based on the number of text-content("string"). With this checked the pos_img input dosen't work
+- Automatically generate mask as pos_img based on the number of text-content("string"). With this checked the manual_draw mask dosen't work.
 
 ### nonEdit_random_gen_width & nonEdit_random_gen_height:
 
