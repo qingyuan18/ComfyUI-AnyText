@@ -16,7 +16,7 @@ from pytorch_lightning import seed_everything
 from .AnyText_bert_tokenizer import BasicTokenizer
 import folder_paths
 from huggingface_hub import hf_hub_download
-from ..utils import is_module_imported
+from ..utils import is_module_imported, t5_translate_en_ru_zh
 
 checker = BasicTokenizer()
 BBOX_MAX_NUM = 8
@@ -26,7 +26,7 @@ max_chars = 20
 comfyui_models_dir = folder_paths.models_dir
 
 class AnyText_Pipeline():
-    def __init__(self, ckpt_path, clip_path, translator_path, cfg_path, use_translator, device, use_fp16):
+    def __init__(self, ckpt_path, clip_path, translator_path, cfg_path, use_translator, device, use_fp16, all_to_device):
         self.device = device
         self.use_fp16 = use_fp16
         self.translator_path = translator_path
@@ -50,21 +50,24 @@ class AnyText_Pipeline():
         self.ckpt_path = ckpt_path
         self.model = create_model(self.cfg_path, cond_stage_path=self.clip_path, use_fp16=self.use_fp16)
         if self.use_fp16:
-            self.model = self.model.half()
+            self.model = self.model.half().eval().to(self.device)
         self.model.load_state_dict(load_state_dict(self.ckpt_path, location='cpu'), strict=False)
-        self.model = self.model.eval().to(self.device)
+        if all_to_device == True:
+            self.model.load_state_dict(load_state_dict(self.ckpt_path, location=device), strict=False)
         self.ddim_sampler = DDIMSampler(self.model, device=self.device)
         if use_translator == True:
             #加载中译英模型，模型地址https://modelscope.cn/models/iic/nlp_csanmt_translation_zh2en
-            if "Auto_DownLoad" not in translator_path:
-                self.zh2en_path = self.translator_path
+            if "utrobinmv/t5_translate_en_ru_zh_small_1024" in translator_path:
+                self.trans_pipe = "utrobinmv/t5_translate_en_ru_zh_small_1024"
             else:
-                self.zh2en_path = "damo/nlp_csanmt_translation_zh2en"
-            if not is_module_imported('pipeline'):
-                from modelscope.pipelines import pipeline
-            if not is_module_imported('Tasks'):
-                from modelscope.utils.constant import Tasks
-            self.trans_pipe = pipeline(task=Tasks.translation, model=self.zh2en_path, device=self.device)
+                self.zh2en_path = os.path.join(folder_paths.models_dir, "prompt_generator", "nlp_csanmt_translation_zh2en")
+                if not os.access(os.path.join(self.zh2en_path, "tf_ckpts", "ckpt-0.data-00000-of-00001"), os.F_OK):
+                    self.zh2en_path = "damo/nlp_csanmt_translation_zh2en"
+                if not is_module_imported('pipeline'):
+                    from modelscope.pipelines import pipeline
+                if not is_module_imported('Tasks'):
+                    from modelscope.utils.constant import Tasks
+                self.trans_pipe = pipeline(task=Tasks.translation, model=self.zh2en_path, device=self.device)
         else:
             self.trans_pipe = None
     
@@ -274,7 +277,13 @@ class AnyText_Pipeline():
             if self.trans_pipe is None:
                 return None, None
             old_prompt = prompt
-            prompt = self.trans_pipe(input=prompt + ' .')['translation'][:-1]
+            if self.trans_pipe == "utrobinmv/t5_translate_en_ru_zh_small_1024":
+                self.zh2en_path = os.path.join(folder_paths.models_dir, "prompt_generator", "models--utrobinmv--t5_translate_en_ru_zh_small_1024")
+                if not os.access(os.path.join(self.zh2en_path, "model.safetensors"), os.F_OK):
+                    self.zh2en_path = "utrobinmv/t5_translate_en_ru_zh_small_1024"
+                prompt = t5_translate_en_ru_zh('en', prompt + ' .', self.zh2en_path, self.device)[0]
+            else:
+                prompt = self.trans_pipe(input=prompt + ' .')['translation'][:-1]
             print(f'Translate: {old_prompt} --> {prompt}')
         return prompt, strs
 

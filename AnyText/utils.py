@@ -6,6 +6,7 @@ import node_helpers
 from PIL import Image, ImageOps, ImageSequence
 import hashlib
 import numpy as np
+import time
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
 comfyui_models_dir = folder_paths.models_dir
@@ -18,18 +19,16 @@ class AnyText_loader:
         font_list = os.listdir(os.path.join(comfyui_models_dir, "fonts"))
         checkpoints_list = folder_paths.get_filename_list("checkpoints")
         clip_list = os.listdir(os.path.join(comfyui_models_dir, "clip"))
-        translator_list = os.listdir(os.path.join(comfyui_models_dir, "prompt_generator"))
         font_list.insert(0, "Auto_DownLoad")
         checkpoints_list.insert(0, "Auto_DownLoad")
         clip_list.insert(0, "Auto_DownLoad")
-        translator_list.insert(0, "Auto_DownLoad")
 
         return {
             "required": {
                 "font": (font_list, ),
                 "ckpt_name": (checkpoints_list, ),
                 "clip": (clip_list, ),
-                "translator": (translator_list, ),
+                "translator": (["utrobinmv/t5_translate_en_ru_zh_small_1024", "damo/nlp_csanmt_translation_zh2en"],{"default": "utrobinmv/t5_translate_en_ru_zh_base_200"}), 
                 # "show_debug": ("BOOLEAN", {"default": False}),
                 }
             }
@@ -162,48 +161,73 @@ class AnyText_translator:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "device": (['cpu', 'gpu'] , {"default": "gpu"}),
+                "model":  (["utrobinmv/t5_translate_en_ru_zh_small_1024", "damo/nlp_csanmt_translation_zh2en"],{"default": "utrobinmv/t5_translate_en_ru_zh_base_200"}), 
                 "prompt": ("STRING", {"default": "这里是单批次翻译文本输入。\n声明补充说，沃伦的同事都深感震惊，并且希望他能够投案自首。\n尽量输入单句文本，如果是多句长文本建议人工分句，否则可能出现漏译或未译等情况！！！\n使用换行，效果可能更佳。", "multiline": True}),
                 "Batch_prompt": ("STRING", {"default": "这里是多批次翻译文本输入，使用换行进行分割。\n天上掉馅饼啦，快去看超人！！！\n飞流直下三千尺，疑似银河落九天。\n启用Batch_Newline表示输出的翻译会按换行输入进行二次换行,否则是用空格合并起来的整篇文本。", "multiline": True}),
-                "Batch_Newline" :("BOOLEAN", {"default": True}),
+                "t5_Target_Language": (["en", "zh", "ru", ],{"default": "en"}), 
                 "if_Batch": ("BOOLEAN", {"default": False}),
+                "Batch_Newline" :("BOOLEAN", {"default": True}),
+                "device": (["auto", "cuda", "cpu", "mps", "xpu"],{"default": "auto"}), 
             },
         }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("中译英结果",)
+    RETURN_NAMES = ("text",)
     CATEGORY = "ExtraModels/AnyText"
     FUNCTION = "AnyText_translator"
-    TITLE = "AnyText中译英-阿里达摩院damo/nlp_csanmt_translation_zh2en"
+    TITLE = "AnyText Translator"
 
-    def AnyText_translator(self, prompt, Batch_prompt, if_Batch, device, Batch_Newline):
+    def AnyText_translator(self, prompt, model, Batch_prompt, if_Batch, device, Batch_Newline, t5_Target_Language):
+        device = get_device_by_name(device)
         # 使用换行(\n)作为分隔符
         Batch_prompt = Batch_prompt.split("\n")  
-        if if_Batch == True:
-            input_sequence = Batch_prompt
-            # 用特定的连接符<SENT_SPLIT>，将多个句子进行串联
-            input_sequence = '<SENT_SPLIT>'.join(input_sequence)
-        else:
-            input_sequence = prompt
-        if os.access(os.path.join(comfyui_models_dir, "prompt_generator", "nlp_csanmt_translation_zh2en", "tf_ckpts", "ckpt-0.data-00000-of-00001"), os.F_OK):
-            zh2en_path = os.path.join(comfyui_models_dir, 'prompt_generator', 'nlp_csanmt_translation_zh2en')
-        else:
-            zh2en_path = "damo/nlp_csanmt_translation_zh2en"
-        
-        if not is_module_imported('pipeline'):
-            from modelscope.pipelines import pipeline
-        if not is_module_imported():
-            from modelscope.utils.constant import Tasks
-        pipeline_ins = pipeline(task=Tasks.translation, model=zh2en_path, device=device)
-        outputs = pipeline_ins(input=input_sequence)
-        if if_Batch == True:
-            results = outputs['translation'].split('<SENT_SPLIT>')
-            if Batch_Newline == True:
-                results = '\n\n'.join(results)
+        input_sequence = prompt
+        if model == 'damo/nlp_csanmt_translation_zh2en':
+            sttime = time.time()
+            if if_Batch == True:
+                input_sequence = Batch_prompt
+                # 用特定的连接符<SENT_SPLIT>，将多个句子进行串联
+                input_sequence = '<SENT_SPLIT>'.join(input_sequence)
+            if os.access(os.path.join(comfyui_models_dir, "prompt_generator", "nlp_csanmt_translation_zh2en", "tf_ckpts", "ckpt-0.data-00000-of-00001"), os.F_OK):
+                zh2en_path = os.path.join(comfyui_models_dir, 'prompt_generator', 'nlp_csanmt_translation_zh2en')
             else:
-                results = ' '.join(results)
+                zh2en_path = "damo/nlp_csanmt_translation_zh2en"
+            
+            if not is_module_imported('pipeline'):
+                from modelscope.pipelines import pipeline
+            if not is_module_imported('Tasks'):
+                from modelscope.utils.constant import Tasks
+            if device == 'cuda':
+                pipeline_ins = pipeline(task=Tasks.translation, model=zh2en_path, device='gpu')
+            outputs = pipeline_ins(input=input_sequence)
+            if if_Batch == True:
+                results = outputs['translation'].split('<SENT_SPLIT>')
+                if Batch_Newline == True:
+                    results = '\n\n'.join(results)
+                else:
+                    results = ' '.join(results)
+            else:
+                results = outputs['translation']
+            endtime = time.time()
+            print("\033[93mTime for translating(翻译耗时): ", endtime - sttime, "\033[0m")
         else:
-            results = outputs['translation']
+            if if_Batch == True:
+                input_sequence = Batch_prompt
+                # 用特定的连接符<SENT_SPLIT>，将多个句子进行串联
+                input_sequence = '|'.join(input_sequence)
+            self.zh2en_path = os.path.join(folder_paths.models_dir, "prompt_generator", "models--utrobinmv--t5_translate_en_ru_zh_small_1024")
+            if not os.access(os.path.join(self.zh2en_path, "model.safetensors"), os.F_OK):
+                self.zh2en_path = "utrobinmv/t5_translate_en_ru_zh_small_1024"
+            outputs = t5_translate_en_ru_zh(t5_Target_Language, input_sequence, self.zh2en_path, device)[0]
+            if if_Batch == True:
+                results = outputs.split('|')
+                if Batch_Newline == True:
+                    results = '\n\n'.join(results)
+                else:
+                    results = ' '.join(results)
+            else:
+                results = outputs
+        
         with open(temp_txt_path, "w", encoding="UTF-8") as text_file:
             text_file.write(results)
         return (results, )
@@ -244,3 +268,28 @@ NODE_CLASS_MAPPINGS = {
     "AnyText_Pose_IMG": AnyText_Pose_IMG,
     "AnyText_translator": AnyText_translator,
 }
+
+def t5_translate_en_ru_zh(Target_Language, prompt, model_path, device):
+    
+    # prefix = 'translate to en: '
+    sttime = time.time()
+    if not is_module_imported('T5ForConditionalGeneration'):
+        from transformers import T5ForConditionalGeneration
+    if not is_module_imported('T5Tokenizer'):
+        from transformers import T5Tokenizer
+    model = T5ForConditionalGeneration.from_pretrained(model_path,)
+    tokenizer = T5Tokenizer.from_pretrained(model_path)
+    if Target_Language == 'zh':
+        prefix = 'translate to zh: '
+    elif Target_Language == 'en':
+        prefix = 'translate to en: '
+    else:
+        prefix = 'translate to ru: '
+    src_text = prefix + prompt
+    input_ids = tokenizer(src_text, return_tensors="pt")
+    generated_tokens = model.generate(**input_ids).to(device, torch.float32)
+    result = tokenizer.batch_decode(generated_tokens, skip_special_tokens=True)
+    model.to('cpu')
+    endtime = time.time()
+    print("\033[93mTime for translating(翻译耗时): ", endtime - sttime, "\033[0m")
+    return result

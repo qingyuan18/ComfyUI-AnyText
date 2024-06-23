@@ -3,13 +3,14 @@
 ## Original Repo: [AnyText: Multilingual Visual Text Generation And Editing](https://github.com/tyxsspa/AnyText)
 
 ## Warning: 
-- **Do not install modelscope & tensorflow packages if translator not needed!!!**
+- **Do not install modelscope & tensorflow packages if `damo/nlp_csanmt_translation_zh2en` translator not needed!!!**
 - This custom-node results maybe worse than official. 
-- Tested only on **cuda with fp16** , you can try others options but maybe not work.
+- Tested only on **cuda with fp16/fp32** , you can try others options but maybe not work.
 - Tested with **Official_ComfyUI_Stable_Release** using **python_embed** on **windows** in my case. Distributions from unofficial or vitural env or other OS(such as linux) maybe not work.
 ### v2 test, more native, not remote_code mode.
 
 ## Instructions:
+- `utrobinmv/t5_translate_en_ru_zh_small_1024` (212MB) is faster and smaller, but accurancy is far worse than `damo/nlp_csanmt_translation_zh2en`(7.3GB).
 - Input_prompts will be checked if is_Chinese_prompts to decide whether auto load translator or not.
 - Numbers of draw_masks must >= nunbers of string_content (in the "") we want to generate, or it will raise an error ["not enough values to unpack"](https://github.com/zmwv823/ComfyUI-AnyText/issues/7).
 - works on my pc: ComfyUI official release+(ComfyUI_windows_portable\ComfyUI)start with powershell+python_embed+win10+py311+torch2.3.0+cu121+rtx3050laptop(4GB).
@@ -22,7 +23,8 @@
 - clip model [**clip-vit-large-patch14**](https://huggingface.co/openai/clip-vit-large-patch14) will download into `C:\Users\username\.cache\huggingface\hub`. We can manually download all files from [clip_model](https://huggingface.co/openai/clip-vit-large-patch14) into **ComfyUI\models\clip\openai--clip-vit-large-patch14**.
 - ![](./AnyText/assets/clip_model.jpg)
 - [Font-(SourceHanSansSC-Medium.otf)-18MB](https://huggingface.co/Sanster/AnyText/blob/main/SourceHanSansSC-Medium.otf) will download into **ComfyUI\models\fonts** from huggingface, we can use any other fonts too.
-- Translator model [modelscope--damo\nlp_csanmt_translation_zh2en--7.3GB](https://www.modelscope.cn/models/iic/nlp_csanmt_translation_zh2en) will download into `C:\Users\username\.cache\modelscope\hub\damo`. We can maually download translator model from link before, then put all files into **ComfyUI\models\prompt_generator\nlp_csanmt_translation_zh2en**![](./AnyText/assets/zh2en_model.jpg)
+- Translator model [huggingface--utrobinmv/t5_translate_en_ru_zh_small_1024-212MB](https://huggingface.co/utrobinmv/t5_translate_en_ru_zh_small_1024) will download into `C:\Users\username\.cache\huggingface\hub` or  [modelscope--damo\nlp_csanmt_translation_zh2en--7.3GB](https://www.modelscope.cn/models/iic/nlp_csanmt_translation_zh2en) will download into `C:\Users\username\.cache\modelscope\hub\damo`. We can maually download translator model from link before, then put all files into `ComfyUI\models\prompt_generator\models--utrobinmv--t5_translate_en_ru_zh_small_1024` or `ComfyUI\models\prompt_generator\nlp_csanmt_translation_zh2en`.
+- ![](./AnyText/assets/zh2en_model.jpg)
 - **The AnyText model itself is also a standard sd1.5 text2image model.**
 ## Example Prompts:
 ### Text-Generation English Prompts:

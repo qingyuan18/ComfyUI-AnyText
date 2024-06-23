@@ -33,8 +33,6 @@ class AnyText:
                 # "width": ("INT", {"forceInput": True}),
                 # "height": ("INT", {"forceInput": True}),
                 "Random_Gen": ("BOOLEAN", {"default": False}),
-                "fp16": ("BOOLEAN", {"default": True}),
-                "device": (["auto", "cuda", "cpu", "mps", "xpu"],{"default": "auto"}), 
                 "strength": ("FLOAT", {
                     "default": 1.00,
                     "min": -999999,
@@ -53,6 +51,9 @@ class AnyText:
                     "max": 1,
                     "step": 0.1
                 }),
+                "device": (["auto", "cuda", "cpu", "mps", "xpu"],{"default": "auto"}), 
+                "fp16": ("BOOLEAN", {"default": True}),
+                "all_to_device": ("BOOLEAN", {"default": False}),
             },
             "optional": {
                         "AnyText_images": ("AnyText_images", {"forceInput": True}),
@@ -77,6 +78,7 @@ class AnyText:
         img_count, 
         fp16,
         device,
+        all_to_device,
         ddim_steps=20, 
         strength=1, 
         cfg_scale=9, 
@@ -173,20 +175,25 @@ class AnyText:
         prompt_modify = prompt_replace(prompt)
         bool_is_chinese = AnyText_Pipeline.is_chinese(self, prompt_modify)
         
+        device = get_device_by_name(device)
+        loader_out = AnyText_Loader.split("|")
+        
         if bool_is_chinese == False:
             use_translator = False
         else:
             use_translator = True
-            if os.access(os.path.join(folder_paths.models_dir, "prompt_generator", "nlp_csanmt_translation_zh2en", "tf_ckpts", "ckpt-0.data-00000-of-00001"), os.F_OK):
-                pass
+            if 'damo/nlp_csanmt_translation_zh2en' in loader_out[3]:
+                if not os.access(os.path.join(folder_paths.models_dir, "prompt_generator", "nlp_csanmt_translation_zh2en", "tf_ckpts", "ckpt-0.data-00000-of-00001"), os.F_OK):
+                    if not is_module_imported('snapshot_download'):
+                        from modelscope.hub.snapshot_download import snapshot_download
+                    snapshot_download('damo/nlp_csanmt_translation_zh2en')
             else:
-                if not is_module_imported('snapshot_download'):
-                    from modelscope.hub.snapshot_download import snapshot_download
-                snapshot_download('damo/nlp_csanmt_translation_zh2en', revision='v1.0.1')
+                if not os.access(os.path.join(folder_paths.models_dir, "prompt_generator", "models--utrobinmv--t5_translate_en_ru_zh_small_1024", "model.safetensors"), os.F_OK):
+                    if not is_module_imported('hg_snapshot_download'):
+                        from huggingface_hub import snapshot_download as hg_snapshot_download
+                    hg_snapshot_download(repo_id="utrobinmv/t5_translate_en_ru_zh_small_1024")
         
-        device = get_device_by_name(device)
-        loader_out = AnyText_Loader.split("|")
-        pipe = AnyText_Pipeline(ckpt_path=loader_out[1], clip_path=loader_out[2], translator_path=loader_out[3], cfg_path=loader_out[4], use_translator=use_translator, device=device, use_fp16=fp16)
+        pipe = AnyText_Pipeline(ckpt_path=loader_out[1], clip_path=loader_out[2], translator_path=loader_out[3], cfg_path=loader_out[4], use_translator=use_translator, device=device, use_fp16=fp16, all_to_device=all_to_device)
         
         AnyText_images = AnyText_images.split("|")
         ori = AnyText_images[0]
