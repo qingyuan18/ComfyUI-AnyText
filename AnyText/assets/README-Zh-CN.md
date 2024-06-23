@@ -6,7 +6,7 @@
 - **如果不需要`damo/nlp_csanmt_translation_zh2en`翻译，不要安装modelscope、tensorflow包！！！**
 - 这个插件生成质量可能比官方差很多。
 - 仅测试 **cuda+fp16/fp32** ，其他搭配自行测试。
-- 仅在**ComfyUI官方整合包稳定版**+**绿色便携(python_embed)**+**windows测试**，第三方整合包、虚拟环境和其他操作系统(例如linux)可能无法使用。
+- 仅在**ComfyUI官方整合包稳定版**+**绿色便携(python_embed)**+**windows测试**，第三方整合包、虚拟环境和其他操作系统(例如linux)自行测试，无法保证正常使用。
 ### v2测试，更加本地化，非远程代码模式。
 
 ## 使用说明:
