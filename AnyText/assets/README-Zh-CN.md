@@ -23,7 +23,7 @@
 - [clip模型-**clip-vit-large-patch14**](https://huggingface.co/openai/clip-vit-large-patch14)会下载到 `C:\Users\username\.cache\huggingface\hub`。可以手动下载[clip模型](https://huggingface.co/openai/clip-vit-large-patch14)放到**ComfyUI\models\clip\openai--clip-vit-large-patch14**位置。
 - ![](./clip_model.jpg)
 - [字体-(SourceHanSansSC-Medium.otf)-18MB](https://huggingface.co/Sanster/AnyText/blob/main/SourceHanSansSC-Medium.otf)会从笑脸(huggingface)下载到**ComfyUI\models\fonts**位置，你也可以使用自己的字体。
-- 翻译模型会自动从[笑脸huggingface--utrobinmv/t5_translate_en_ru_zh_small_1024](https://huggingface.co/utrobinmv/t5_translate_en_ru_zh_small_1024)下载到`C:\Users\username\.cache\huggingface\hub`或者 [魔搭modelscope--damo\nlp_csanmt_translation_zh2en--7.3GB](https://www.modelscope.cn/models/iic/nlp_csanmt_translation_zh2en)下载到`C:\Users\username\.cache\modelscope\hub\damo`位置。可以手动从前面链接下载，然后把所有文件放到`ComfyUI\models\prompt_generator\models--utrobinmv--t5_translate_en_ru_zh_small_1024`或者`ComfyUI\models\prompt_generator\nlp_csanmt_translation_zh2en`
+- 翻译模型会自动从[笑脸huggingface--utrobinmv/t5_translate_en_ru_zh_small_1024](https://huggingface.co/utrobinmv/t5_translate_en_ru_zh_small_1024--212MB)下载到`C:\Users\username\.cache\huggingface\hub`或者 [魔搭modelscope--damo\nlp_csanmt_translation_zh2en--7.3GB](https://www.modelscope.cn/models/iic/nlp_csanmt_translation_zh2en)下载到`C:\Users\username\.cache\modelscope\hub\damo`位置。可以手动从前面链接下载，然后把所有文件放到`ComfyUI\models\prompt_generator\models--utrobinmv--t5_translate_en_ru_zh_small_1024`或者`ComfyUI\models\prompt_generator\nlp_csanmt_translation_zh2en`
 - ![](./zh2en_model.jpg)
 - **AnyText模型本身是一个标准的sd1.5文生图模型。**
 

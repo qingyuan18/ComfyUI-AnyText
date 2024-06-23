@@ -50,7 +50,8 @@ class AnyText_Pipeline():
         self.ckpt_path = ckpt_path
         self.model = create_model(self.cfg_path, cond_stage_path=self.clip_path, use_fp16=self.use_fp16)
         if self.use_fp16:
-            self.model = self.model.half().eval().to(self.device)
+            # self.model = self.model.half().eval().to(self.device)
+            self.model = self.model.half().to(self.device)
         if all_to_device == True:
             self.model.load_state_dict(load_state_dict(self.ckpt_path, location=device), strict=False)
         else:
