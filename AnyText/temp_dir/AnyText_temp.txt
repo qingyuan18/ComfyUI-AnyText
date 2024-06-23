@@ -1,1 +1,7 @@
-Введите однократный перевод текста, добавив, что коллеги Уоррена были глубоко встревожены и надеются, что он сможет сдаться. Постарайтесь ввести одиночный текст, если многократный текст предлагает искусственное выписку, иначе может возникнуть утечка или неперевод!!!
+Here are multiple batches of translated text input, split using line breaks.
+
+Pie in the sky, go see Superman!
+
+Flying down three thousand feet, suspected Milky Way falling nine days.
+
+Enabling Batch _ Newline means that the output translation will wrap twice according to the line break input, otherwise it will be the whole text merged with spaces.

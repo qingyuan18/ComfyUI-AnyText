@@ -51,9 +51,10 @@ class AnyText_Pipeline():
         self.model = create_model(self.cfg_path, cond_stage_path=self.clip_path, use_fp16=self.use_fp16)
         if self.use_fp16:
             self.model = self.model.half().eval().to(self.device)
-        self.model.load_state_dict(load_state_dict(self.ckpt_path, location='cpu'), strict=False)
         if all_to_device == True:
             self.model.load_state_dict(load_state_dict(self.ckpt_path, location=device), strict=False)
+        else:
+            self.model.load_state_dict(load_state_dict(self.ckpt_path, location='cpu'), strict=False)
         self.ddim_sampler = DDIMSampler(self.model, device=self.device)
         if use_translator == True:
             #加载中译英模型，模型地址https://modelscope.cn/models/iic/nlp_csanmt_translation_zh2en

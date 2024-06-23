@@ -28,7 +28,7 @@ class AnyText_loader:
                 "font": (font_list, ),
                 "ckpt_name": (checkpoints_list, ),
                 "clip": (clip_list, ),
-                "translator": (["utrobinmv/t5_translate_en_ru_zh_small_1024", "damo/nlp_csanmt_translation_zh2en"],{"default": "utrobinmv/t5_translate_en_ru_zh_base_200"}), 
+                "translator": (["utrobinmv/t5_translate_en_ru_zh_small_1024", "damo/nlp_csanmt_translation_zh2en"],{"default": "utrobinmv/t5_translate_en_ru_zh_small_1024"}), 
                 # "show_debug": ("BOOLEAN", {"default": False}),
                 }
             }
@@ -161,7 +161,7 @@ class AnyText_translator:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "model":  (["utrobinmv/t5_translate_en_ru_zh_small_1024", "damo/nlp_csanmt_translation_zh2en"],{"default": "utrobinmv/t5_translate_en_ru_zh_base_200"}), 
+                "model":  (["utrobinmv/t5_translate_en_ru_zh_small_1024", "damo/nlp_csanmt_translation_zh2en"],{"default": "utrobinmv/t5_translate_en_ru_zh_small_1024"}), 
                 "prompt": ("STRING", {"default": "这里是单批次翻译文本输入。\n声明补充说，沃伦的同事都深感震惊，并且希望他能够投案自首。\n尽量输入单句文本，如果是多句长文本建议人工分句，否则可能出现漏译或未译等情况！！！\n使用换行，效果可能更佳。", "multiline": True}),
                 "Batch_prompt": ("STRING", {"default": "这里是多批次翻译文本输入，使用换行进行分割。\n天上掉馅饼啦，快去看超人！！！\n飞流直下三千尺，疑似银河落九天。\n启用Batch_Newline表示输出的翻译会按换行输入进行二次换行,否则是用空格合并起来的整篇文本。", "multiline": True}),
                 "t5_Target_Language": (["en", "zh", "ru", ],{"default": "en"}), 
@@ -220,7 +220,7 @@ class AnyText_translator:
                 self.zh2en_path = "utrobinmv/t5_translate_en_ru_zh_small_1024"
             outputs = t5_translate_en_ru_zh(t5_Target_Language, input_sequence, self.zh2en_path, device)[0]
             if if_Batch == True:
-                results = outputs.split('|')
+                results = outputs.split('| ')
                 if Batch_Newline == True:
                     results = '\n\n'.join(results)
                 else:
