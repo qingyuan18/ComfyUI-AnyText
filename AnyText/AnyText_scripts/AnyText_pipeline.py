@@ -286,6 +286,9 @@ class AnyText_Pipeline():
                 prompt = t5_translate_en_ru_zh('en', prompt + ' .', self.zh2en_path, self.device)[0]
             else:
                 prompt = self.trans_pipe(input=prompt + ' .')['translation'][:-1]
+                del self.trans_pipe
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
             print(f'Translate: {old_prompt} --> {prompt}')
         return prompt, strs
 

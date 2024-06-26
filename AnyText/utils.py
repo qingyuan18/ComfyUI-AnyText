@@ -210,6 +210,9 @@ class AnyText_translator:
                 results = outputs['translation']
             endtime = time.time()
             print("\033[93mTime for translating(翻译耗时): ", endtime - sttime, "\033[0m")
+            del pipeline_ins
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
         else:
             if if_Batch == True:
                 input_sequence = Batch_prompt
