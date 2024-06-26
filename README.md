@@ -7,6 +7,8 @@
 - This custom-node results maybe worse than official. 
 - Tested only on **cuda with fp16/fp32** , you can try others options but maybe not work.
 - Tested with **Official_ComfyUI_Stable_Release** using **python_embed** on **windows** in my case. Distributions from unofficial or vitural env or other OS(such as linux) maybe not work.
+- tensorflow need specified cuda_version to run on gpu, but on windows 2.16.0rc0+(latest at now:2.17.0rc0) will not work on cuda, it's an official issue. In this case, `damo/nlp_csanmt_translation_zh2en` translator will run slowly on cpu.
+- `2.15.1 cuda:11.8 | 2.16.0rc0+ cuda:12`
 ### v2 test, more native, not remote_code mode.
 
 ## Instructions:
