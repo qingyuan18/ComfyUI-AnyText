@@ -7,8 +7,7 @@
 - 这个插件生成质量可能比官方差很多。
 - 仅测试 **cuda+fp16/fp32** ，其他搭配自行测试。
 - 仅在**ComfyUI官方整合包稳定版**+**绿色便携(python_embed)**+**windows测试**，第三方整合包、虚拟环境和其他操作系统(例如linux)自行测试，无法保证正常使用。
-- tensorflow需要特定版本cuda才能跑到gpu上，但是在windows上2.16.0rc0+(目前最新版本:2.17.0rc0)暂时无法正常调用gpu，这是个官方issue。这种情况下`damo/nlp_csanmt_translation_zh2en`翻译只能跑在cpu上，速度很慢。
-- `2.15.1 cuda:11.8 | 2.16.0rc0+ cuda:12`
+- Tensorflow需要特定版本cuda才能跑到gpu上，但是在原生windows上 [tensorflow 2.10+：详情看note](https://github.com/tensorflow/tensorflow/releases/tag/v2.11.1) 无法调用gpu，必须使用linux或者wsl2才行。这种情况下`damo/nlp_csanmt_translation_zh2en`翻译只能跑在cpu上，速度很慢。
 ### v2测试，更加本地化，非远程代码模式。
 
 ## 使用说明:
