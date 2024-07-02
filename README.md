@@ -8,6 +8,7 @@
 - Tested only on **cuda with fp16/fp32** , you can try others options but maybe not work.
 - Tested with **Official_ComfyUI_Stable_Release** using **python_embed** on **windows** in my case. Distributions from unofficial or vitural env or other OS(such as linux) maybe not work.
 - Tensorflow need specified cuda_version to run on gpu, but on native windows [tensorflow 2.10+: look at the note](https://github.com/tensorflow/tensorflow/releases/tag/v2.11.1) will not work on cuda, we need linux or wsl2 to make gpu work. In this case, `damo/nlp_csanmt_translation_zh2en` translator will run slowly on cpu.
+- If error `Input type (torch.cuda.FloatTensor) and weight type (torch.FloatTensor) should be the same` raise, try set **all_to_device** to true, maybe works. Thanks to **@[602387193c](https://github.com/602387193c)**----->**[issues/17](https://github.com/zmwv823/ComfyUI-AnyText/issues/17)**.
 ### v2 test, more native, not remote_code mode.
 
 ## Instructions:
