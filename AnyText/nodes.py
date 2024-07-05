@@ -12,7 +12,7 @@ Random_Gen_Mask_path = os.path.join(current_directory, "temp_dir",  "AnyText_ran
 class AnyText:
   
     def __init__(self):
-        pass
+        self.model = None
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -53,6 +53,7 @@ class AnyText:
                 }),
                 "device": (["auto", "cuda", "cpu", "mps", "xpu"],{"default": "auto"}), 
                 "fp16": ("BOOLEAN", {"default": True}),
+                "cpu_offload": ("BOOLEAN", {"default": False, "label_on": "model_to_cpu", "label_off": "unload_model"}),
                 "all_to_device": ("BOOLEAN", {"default": False}),
             },
             "optional": {
@@ -74,6 +75,7 @@ class AnyText:
         revise_pos,
         Random_Gen,
         prompt, 
+        cpu_offload,
         # show_debug, 
         img_count, 
         fp16,
@@ -193,7 +195,7 @@ class AnyText:
                         from huggingface_hub import snapshot_download as hg_snapshot_download
                     hg_snapshot_download(repo_id="utrobinmv/t5_translate_en_ru_zh_small_1024")
         
-        pipe = AnyText_Pipeline(ckpt_path=loader_out[1], clip_path=loader_out[2], translator_path=loader_out[3], cfg_path=loader_out[4], use_translator=use_translator, device=device, use_fp16=fp16, all_to_device=all_to_device)
+        pipe = AnyText_Pipeline(ckpt_path=loader_out[1], clip_path=loader_out[2], translator_path=loader_out[3], cfg_path=loader_out[4], use_translator=use_translator, device=device, use_fp16=fp16, all_to_device=all_to_device, loaded_model_tensor=self.model)
         
         AnyText_images = AnyText_images.split("|")
         ori = AnyText_images[0]
@@ -255,7 +257,7 @@ class AnyText:
         #             \033[93mori_image location(原图位置): {ori}, \033[0m\n \
         #             \033[93mSort Position(文本生成位置排序): {sort_radio}, \033[0m\n \
         #             \033[93mEnable revise_pos(启用位置修正): {revise_pos}, \033[0m')
-        x_samples, results, rtn_code, rtn_warning, debug_info = pipe(input_data, font_path=loader_out[0], **params)
+        x_samples, results, rtn_code, rtn_warning, debug_info, self.model = pipe(input_data, font_path=loader_out[0], cpu_offload=cpu_offload, **params)
         if rtn_code < 0:
             raise Exception(f"Error in AnyText pipeline: {rtn_warning}")
         output = pil2tensor(x_samples)

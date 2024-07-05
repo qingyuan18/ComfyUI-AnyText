@@ -26,7 +26,7 @@ max_chars = 20
 comfyui_models_dir = folder_paths.models_dir
 
 class AnyText_Pipeline():
-    def __init__(self, ckpt_path, clip_path, translator_path, cfg_path, use_translator, device, use_fp16, all_to_device):
+    def __init__(self, ckpt_path, clip_path, translator_path, cfg_path, use_translator, device, use_fp16, all_to_device, loaded_model_tensor):
         self.device = device
         self.use_fp16 = use_fp16
         self.translator_path = translator_path
@@ -48,7 +48,13 @@ class AnyText_Pipeline():
             clip_path = "openai/clip-vit-large-patch14"
         self.clip_path = clip_path
         self.ckpt_path = ckpt_path
-        self.model = create_model(self.cfg_path, cond_stage_path=self.clip_path, use_fp16=self.use_fp16)
+        
+        if loaded_model_tensor == None:
+            self.model = create_model(self.cfg_path, cond_stage_path=self.clip_path, use_fp16=self.use_fp16)
+        else:
+            self.model = loaded_model_tensor
+            self.model.to(device)
+            
         if self.use_fp16:
             # self.model = self.model.half().eval().to(self.device)
             self.model = self.model.half().to(self.device)
@@ -73,7 +79,7 @@ class AnyText_Pipeline():
         else:
             self.trans_pipe = None
     
-    def __call__(self, input_tensor, font_path, **forward_params):
+    def __call__(self, input_tensor, font_path, cpu_offload, **forward_params):
         if "Auto_DownLoad" not in font_path:
             font_path = font_path
         else:
@@ -269,7 +275,19 @@ class AnyText_Pipeline():
                            \033[93mUse Device(使用设备): {self.device}\n\033[0m \
                            \033[93mCost Time(生成耗时): {(time.time()-tic):.2f}s\033[0m'
         rst_code = 1 if str_warning else 0
-        return x_samples, results, rst_code, str_warning, debug_info
+        
+        if cpu_offload == True:
+            self.model.to('cpu')
+        else:
+            if self.model != None:
+                del self.model
+                import gc
+                gc.collect()
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+                self.model = None
+        
+        return x_samples, results, rst_code, str_warning, debug_info, self.model
 
     def modify_prompt(self, prompt):
         prompt = prompt.replace('“', '"')

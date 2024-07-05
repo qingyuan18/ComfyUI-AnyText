@@ -3,6 +3,7 @@
 ## 原Repo: [AnyText: Multilingual Visual Text Generation And Editing](https://github.com/tyxsspa/AnyText)
 
 ## 警告: 
+- 非程序员，机械类工科毕业，自从毕业后从未接触过任何代码，所以很多问题我都没办法解决。
 - **如果不需要`damo/nlp_csanmt_translation_zh2en`翻译，不要安装modelscope、tensorflow包！！！**
 - 这个插件生成质量可能比官方差很多。
 - 仅测试 **cuda+fp16/fp32** ，其他搭配自行测试。

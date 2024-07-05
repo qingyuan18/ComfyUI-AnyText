@@ -3,6 +3,7 @@
 ## Original Repo: [AnyText: Multilingual Visual Text Generation And Editing](https://github.com/tyxsspa/AnyText)
 
 ## Warning: 
+- I'm not a coder, major of machinery in college, never touched any code since graduated, so many issues i have no idea how to solve.
 - **Do not install modelscope & tensorflow packages if `damo/nlp_csanmt_translation_zh2en` translator not needed!!!**
 - This custom-node results maybe worse than official. 
 - Tested only on **cuda with fp16/fp32** , you can try others options but maybe not work.
