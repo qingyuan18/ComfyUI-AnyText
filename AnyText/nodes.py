@@ -57,9 +57,9 @@ class AnyText:
                 "all_to_device": ("BOOLEAN", {"default": False}),
             },
             "optional": {
-                        "AnyText_images": ("AnyText_images", {"forceInput": True}),
-                        # "show_debug": ("BOOLEAN", {"default": False}),
-                        },
+              "ori_image_path": ("STRING", {"multiline": False}),
+              "mask_img_path": ("STRING", {"multiline": False}),
+              },
         }
 
     RETURN_TYPES = ("IMAGE",)
@@ -70,7 +70,8 @@ class AnyText:
     def anytext_process(self,
         mode,
         AnyText_Loader,
-        AnyText_images,
+        ori_image_path,
+        mask_img_path,
         sort_radio,
         revise_pos,
         Random_Gen,
@@ -196,10 +197,9 @@ class AnyText:
                     hg_snapshot_download(repo_id="utrobinmv/t5_translate_en_ru_zh_small_1024")
         
         pipe = AnyText_Pipeline(ckpt_path=loader_out[1], clip_path=loader_out[2], translator_path=loader_out[3], cfg_path=loader_out[4], use_translator=use_translator, device=device, use_fp16=fp16, all_to_device=all_to_device, loaded_model_tensor=self.model)
-        
-        AnyText_images = AnyText_images.split("|")
-        ori = AnyText_images[0]
-        pos = AnyText_images[1]
+
+        ori = ori_image_path
+        pos = mask_image_path
         if mode == "text-generation":
             ori_image = None
             revise_pos = revise_pos
