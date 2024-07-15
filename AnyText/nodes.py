@@ -19,6 +19,8 @@ class AnyText:
         return {
             "required": {
                 "AnyText_Loader": ("AnyText_Loader", {"forceInput": True}),
+                "ori_image_path": ("STRING", {"multiline": False,"forceInput": True}),
+                "mask_img_path": ("STRING", {"multiline": False,"forceInput": True}),
                 "prompt": ("STRING", {"default": "A raccoon stands in front of the blackboard with the words \"你好呀~Hello!\" written on it.", "multiline": True}),
                 "a_prompt": ("STRING", {"default": "best quality, extremely detailed,4k, HD, supper legible text,  clear text edges,  clear strokes, neat writing, no watermarks", "multiline": True}),
                 "n_prompt": ("STRING", {"default": "low-res, bad anatomy, extra digit, fewer digits, cropped, worst quality, low quality, watermark, unreadable text, messy words, distorted text, disorganized writing, advertising picture", "multiline": True}),
@@ -55,11 +57,7 @@ class AnyText:
                 "fp16": ("BOOLEAN", {"default": True}),
                 "cpu_offload": ("BOOLEAN", {"default": False, "label_on": "model_to_cpu", "label_off": "unload_model"}),
                 "all_to_device": ("BOOLEAN", {"default": False}),
-            },
-            "optional": {
-              "ori_image_path": ("STRING", {"multiline": False}),
-              "mask_img_path": ("STRING", {"multiline": False}),
-              },
+            }
         }
 
     RETURN_TYPES = ("IMAGE",)
