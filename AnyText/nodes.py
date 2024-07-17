@@ -174,7 +174,10 @@ class AnyText:
         
         #check if prompt is chinese to decide whether to load translator，检测是否为中文提示词，否则不适用翻译。
         prompt_modify = prompt_replace(prompt)
+
         bool_is_chinese = AnyText_Pipeline.is_chinese(self, prompt_modify)
+        ### do not translate
+        bool_is_chinese = False
         
         device = get_device_by_name(device)
         loader_out = AnyText_Loader.split("|")
@@ -216,7 +219,15 @@ class AnyText:
         # lora_ratio = 1
         # lora_path_ratio = str(lora_path)+ " " + str(lora_ratio)
         # print("\033[93m", lora_path_ratio, "\033[0m")
-        
+
+        ## deal with “｜” delimater into “，” which anyText needs
+        # 使用 '|' 分割文本
+        split_text = prompt.split('|')
+        # 给每个部分加上双引号，并用逗号连接
+        prompt_formated = ','.join(f'"{part.strip()}"' for part in split_text)
+        print("formatted_text",prompt_formated)
+
+
         params = {
             "mode": mode,
             "use_fp16": fp16,
@@ -236,7 +247,7 @@ class AnyText:
             # "lora_path_ratio": lora_path_ratio,
             }
         input_data = {
-                "prompt": prompt,
+                "prompt": prompt_formated,
                 "seed": seed,
                 "draw_pos": pos_img,
                 "ori_image": ori_image,
