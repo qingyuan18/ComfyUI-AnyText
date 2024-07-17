@@ -197,7 +197,7 @@ class AnyText:
         pipe = AnyText_Pipeline(ckpt_path=loader_out[1], clip_path=loader_out[2], translator_path=loader_out[3], cfg_path=loader_out[4], use_translator=use_translator, device=device, use_fp16=fp16, all_to_device=all_to_device, loaded_model_tensor=self.model)
 
         ori = ori_image_path
-        pos = mask_image_path
+        pos = mask_img_path
         if mode == "text-generation":
             ori_image = None
             revise_pos = revise_pos
